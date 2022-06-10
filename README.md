@@ -3,6 +3,20 @@
 Python module to manage the autoscaling of a cluster of virtual machines.
 
 
+## Configuration
+
+All the configuration is contained in the `.env` environment file. To initialize it, launch the following command:
+
+```bash
+make .env
+```
+
+Besides, the following values may be overwritten to configure the module:
+* `APP_HOST`: host of the HTTP server.
+* `APP_PORT`: port of the HTTP server.
+* `PROVIDER`: provider that is used to deploy virtual resources (the only available value is `openstack`).
+
+
 ## Installation
 
 Python [virtualenv](https://virtualenv.pypa.io/en/latest/) is used to run the module. To install it, launch the following command:
@@ -16,19 +30,6 @@ To setup the virtualenv and install the requirements, launch the following comma
 ```bash
 make install
 ```
-
-
-## Configuration
-
-All the configuration is contained in the `.env` environment file. To initialize it, launch the following command:
-
-```bash
-make .env
-```
-
-Besides, the following values may be overwritten to configure the module:
-* `APP_HOST`: host of the HTTP server.
-* `APP_PORT`: port of the HTTP server.
 
 
 ## Launch the module

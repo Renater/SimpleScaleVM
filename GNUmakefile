@@ -11,8 +11,8 @@ env:
 
 .PHONY: install
 install: env
-	env/bin/pip3 install -r requirements.txt
-	if [ -f src/providers/${PROVIDER}/requirements.txt ]; then env/bin/pip3 install -r src/providers/${PROVIDER}/requirements.txt; fi
+	env/bin/python3 -m pip install -r requirements.txt
+	if [ -f src/providers/${PROVIDER}/requirements.txt ]; then env/bin/python3 -m pip install -r src/providers/${PROVIDER}/requirements.txt; fi
 
 .PHONY: lint
 lint:

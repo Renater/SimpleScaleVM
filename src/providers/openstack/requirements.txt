@@ -1,1 +1,1 @@
-python-openstackclient==5.8.0
+openstacksdk==0.99.0

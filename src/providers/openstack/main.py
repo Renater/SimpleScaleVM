@@ -16,7 +16,7 @@ class ProviderService(BaseProviderService):
 
     def __init__(self):
 
-        self.connector = openstack.connect(cloud='conf')
+        self.connector = openstack.connect(cloud="envvars")
 
     def list(self):
 

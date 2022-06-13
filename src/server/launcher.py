@@ -7,7 +7,7 @@ Classes:
 """
 
 from http.server import HTTPServer
-from .request_handler import ServerRequestHandler
+from server.request_handler import ServerRequestHandler
 
 
 class ServerLauncher():

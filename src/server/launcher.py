@@ -13,8 +13,9 @@ from server.request_handler import ServerRequestHandler
 class ServerLauncher():
     """Launcher of autoscaling HTTP servers."""
 
-    host = None
-    port = None
+    host: str
+    port: int
+    server: HTTPServer
 
     def __init__(self, host: str, port: int):
         self.host = host

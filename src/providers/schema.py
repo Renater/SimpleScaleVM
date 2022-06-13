@@ -17,3 +17,6 @@ class BaseProviderService:
 
     def delete(self):
         """Delete a virtual machine."""
+
+    def close(self):
+        """Close all connections linked to the provider."""

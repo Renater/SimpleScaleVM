@@ -11,10 +11,10 @@ COPY src/providers/${provider}/requirements.txt provider.txt
 RUN pip install -r common.txt
 RUN pip install -r provider.txt
 
-WORKDIR /app
+WORKDIR /
 
-COPY src/ .
+COPY src/ /src
 
-EXPOSE 8080
+EXPOSE 8000
 
-ENTRYPOINT [ "python", "main.py" ]
+ENTRYPOINT [ "python", "src/main.py" ]

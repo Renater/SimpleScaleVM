@@ -37,3 +37,7 @@ release: build
 .PHONY: start
 start:
 	env/bin/python3 src/main.py
+
+.PHONY: start-docker
+start-docker: build
+	docker-compose up -d

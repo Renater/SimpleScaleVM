@@ -12,6 +12,7 @@ make .env
 ```
 
 Besides, the following values may be overwritten to configure the module:
+* `VERSION`: semantic version of the project (only used for releasing the Docker image).
 * `APP_HOST`: host of the HTTP server.
 * `APP_PORT`: port of the HTTP server.
 * `PROVIDER`: provider that is used to deploy virtual resources (the only available value is `openstack`).
@@ -62,6 +63,19 @@ To start the module, launch the following command:
 ```bash
 make start
 ```
+
+
+## Working with Docker
+
+Once your project is configured, you can start working with Docker by building, launching and releasing on DockerHub with the respective commands:
+
+```bash
+make build
+make start-docker
+make release
+```
+
+Note that each provider has its specific Docker image version which contains the provider requirements: the Docker tag format is `<provider>-<version>`.
 
 
 ## Licensing

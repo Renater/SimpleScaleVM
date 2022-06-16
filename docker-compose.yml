@@ -2,7 +2,7 @@ version: "3"
 
 services:
   app:
-    image: renater/simplescalevm:test-${PROVIDER}
+    image: renater/simplescalevm:${PROVIDER}-test
     container_name: simplescalevm
     hostname: simplescalevm
     restart: always

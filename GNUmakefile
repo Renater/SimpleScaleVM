@@ -9,7 +9,7 @@ endif
 
 .PHONY: build
 build:
-	docker build -t renater/simplescalevm:test-${PROVIDER} --build-arg provider=${PROVIDER} .
+	docker build -t renater/simplescalevm:${PROVIDER}-test --build-arg provider=${PROVIDER} .
 
 env:
 	virtualenv env
@@ -25,14 +25,14 @@ lint:
 
 .PHONY: release
 release: build
-	docker tag renater/simplescalevm:test-${PROVIDER} renater/simplescalevm:latest-${PROVIDER}
-	docker tag renater/simplescalevm:test-${PROVIDER} renater/simplescalevm:${VERSION}-${PROVIDER}
-	docker tag renater/simplescalevm:test-${PROVIDER} renater/simplescalevm:${shell echo ${VERSION} | cut -d '.' -f -2}-${PROVIDER}
-	docker tag renater/simplescalevm:test-${PROVIDER} renater/simplescalevm:${shell echo ${VERSION} | cut -d '.' -f -1}-${PROVIDER}
-	docker push renater/simplescalevm:latest-${PROVIDER}
-	docker push renater/simplescalevm:${VERSION}-${PROVIDER}
-	docker push renater/simplescalevm:${shell echo ${VERSION} | cut -d '.' -f -2}-${PROVIDER}
-	docker push renater/simplescalevm:${shell echo ${VERSION} | cut -d '.' -f -1}-${PROVIDER}
+	docker tag renater/simplescalevm:${PROVIDER}-test renater/simplescalevm:${PROVIDER}-latest
+	docker tag renater/simplescalevm:${PROVIDER}-test renater/simplescalevm:${PROVIDER}-${VERSION}
+	docker tag renater/simplescalevm:${PROVIDER}-test renater/simplescalevm:${PROVIDER}-${shell echo ${VERSION} | cut -d '.' -f -2}
+	docker tag renater/simplescalevm:${PROVIDER}-test renater/simplescalevm:${PROVIDER}-${shell echo ${VERSION} | cut -d '.' -f -1}
+	docker push renater/simplescalevm:${PROVIDER}-latest
+	docker push renater/simplescalevm:${PROVIDER}-${VERSION}
+	docker push renater/simplescalevm:${PROVIDER}-${shell echo ${VERSION} | cut -d '.' -f -2}
+	docker push renater/simplescalevm:${PROVIDER}-${shell echo ${VERSION} | cut -d '.' -f -1}
 
 .PHONY: start
 start:

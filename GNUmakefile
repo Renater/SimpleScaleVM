@@ -7,6 +7,10 @@ endif
 .env:
 	cp .env.template .env
 
+.PHONY: build
+build:
+	docker build -t renater/simplescalevm:test-${PROVIDER} --build-arg provider=${PROVIDER} .
+
 env:
 	virtualenv env
 
@@ -18,6 +22,17 @@ install: env
 .PHONY: lint
 lint:
 	env/bin/pylint --ignore-patterns=env/* .
+
+.PHONY: release
+release: build
+	docker tag renater/simplescalevm:test-${PROVIDER} renater/simplescalevm:latest-${PROVIDER}
+	docker tag renater/simplescalevm:test-${PROVIDER} renater/simplescalevm:${VERSION}-${PROVIDER}
+	docker tag renater/simplescalevm:test-${PROVIDER} renater/simplescalevm:${shell echo ${VERSION} | cut -d '.' -f -2}-${PROVIDER}
+	docker tag renater/simplescalevm:test-${PROVIDER} renater/simplescalevm:${shell echo ${VERSION} | cut -d '.' -f -1}-${PROVIDER}
+	docker push renater/simplescalevm:latest-${PROVIDER}
+	docker push renater/simplescalevm:${VERSION}-${PROVIDER}
+	docker push renater/simplescalevm:${shell echo ${VERSION} | cut -d '.' -f -2}-${PROVIDER}
+	docker push renater/simplescalevm:${shell echo ${VERSION} | cut -d '.' -f -1}-${PROVIDER}
 
 .PHONY: start
 start:

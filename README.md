@@ -16,6 +16,28 @@ Besides, the following values may be overwritten to configure the module:
 * `APP_PORT`: port of the HTTP server.
 * `PROVIDER`: provider that is used to deploy virtual resources (the only available value is `openstack`).
 
+The environment variables that are specific to the providers are detailed in the following subsections.
+
+### Openstack provider configuration
+
+The following values should be overwritten to configure the connection to the Openstack provider:
+* `OS_AUTH_URL`: URL of the Openstack endpoint.
+* `OS_USERNAME`: name of the Openstack user.
+* `OS_PASSWORD`: password of the Openstack user.
+* `OS_REGION_NAME`: name of the Openstack region.
+* `OS_PROJECT_DOMAIN_ID`: ID of the Openstack project domain.
+* `OS_USER_DOMAIN_NAME`: name of the Openstack project domain.
+* `OS_PROJECT_ID`: ID of the Openstack project.
+* `OS_PROJECT_NAME`: name of the Openstack project.
+* `OS_INTERFACE`: Openstack interface.
+* `OS_IDENTITY_API_VERSION`: version of the Openstack API.
+* `OPENSTACK_FLAVOR`: name of the flavor to use for the virtual machines.
+* `OPENSTACK_IMAGE`: name of the image to use for the virtual machines.
+* `OPENSTACK_NETWORK`: name of the network to use for the virtual machines.
+* `OPENSTACK_METADATA_KEY`: metadata key to identify the scaled server pool.
+* `OPENSTACK_METADATA_VALUE`: metadata value to identify the scaled server pool.
+* `OPENSTACK_KEYPAIR`: name of the keypair that is provisioned on the virtual machines.
+
 
 ## Installation
 

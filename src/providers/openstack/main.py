@@ -8,9 +8,12 @@ Classes:
 
 import openstack
 from providers.openstack.settings import (
-    OPENSTACK_NETWORK,
+    OPENSTACK_FLAVOR,
+    OPENSTACK_IMAGE,
+    OPENSTACK_KEYPAIR,
     OPENSTACK_METADATA_KEY,
     OPENSTACK_METADATA_VALUE,
+    OPENSTACK_NETWORK,
 )
 from providers.schema import BaseProviderService
 
@@ -37,9 +40,18 @@ class ProviderService(BaseProviderService):
 
         return servers
 
-    def create(self):
+    def create(self, count: int = 1):
 
-        print("TO DO")
+        self.connector.create_server(
+            name="gateway",
+            image=OPENSTACK_IMAGE,
+            flavor=OPENSTACK_FLAVOR,
+            key_name=OPENSTACK_KEYPAIR,
+            network=OPENSTACK_NETWORK,
+            meta={ OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_VALUE },
+            min_count=count,
+            max_count=count,
+        )
 
     def delete(self):
 

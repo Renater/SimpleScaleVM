@@ -12,10 +12,10 @@ class BaseProviderService:
     def list(self):
         """List all virtual machines in the autoscaling pool."""
 
-    def create(self):
+    def create(self, count: int):
         """Create a virtual machine."""
 
-    def delete(self):
+    def delete(self, server_id: str):
         """Delete a virtual machine."""
 
     def close(self):

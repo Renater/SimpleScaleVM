@@ -6,6 +6,7 @@ Classes:
     ProviderService
 """
 
+from typing import Dict
 import openstack
 from providers.openstack.settings import (
     OPENSTACK_FLAVOR,
@@ -25,9 +26,9 @@ class ProviderService(BaseProviderService):
 
         self.connector = openstack.connect(cloud="envvars")
 
-    def list(self):
+    def list(self) -> Dict[str, str]:
 
-        servers = []
+        servers = {}
 
         for server_object in self.connector.compute.servers():
             server = server_object.to_dict()
@@ -36,7 +37,7 @@ class ProviderService(BaseProviderService):
                 OPENSTACK_METADATA_KEY in server["metadata"] and
                 server["metadata"][OPENSTACK_METADATA_KEY] == OPENSTACK_METADATA_VALUE
             ):
-                servers.append(server["addresses"][OPENSTACK_NETWORK][0]["addr"])
+                servers[server["id"]] = server["addresses"][OPENSTACK_NETWORK][0]["addr"]
 
         return servers
 
@@ -53,9 +54,9 @@ class ProviderService(BaseProviderService):
             max_count=count,
         )
 
-    def delete(self):
+    def delete(self, server_id: str):
 
-        print("TO DO")
+        self.connector.delete_server(server_id)
 
     def close(self):
 

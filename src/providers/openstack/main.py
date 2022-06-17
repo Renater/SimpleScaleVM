@@ -7,7 +7,11 @@ Classes:
 """
 
 import openstack
-from providers.openstack.settings import OPENSTACK_NETWORK, OPENSTACK_TAG
+from providers.openstack.settings import (
+    OPENSTACK_NETWORK,
+    OPENSTACK_METADATA_KEY,
+    OPENSTACK_METADATA_VALUE,
+)
 from providers.schema import BaseProviderService
 
 
@@ -25,7 +29,10 @@ class ProviderService(BaseProviderService):
         for server_object in self.connector.compute.servers():
             server = server_object.to_dict()
 
-            if OPENSTACK_TAG in server["metadata"]:
+            if (
+                OPENSTACK_METADATA_KEY in server["metadata"] and
+                server["metadata"][OPENSTACK_METADATA_KEY] == OPENSTACK_METADATA_VALUE
+            ):
                 servers.append(server["addresses"][OPENSTACK_NETWORK][0]["addr"])
 
         return servers

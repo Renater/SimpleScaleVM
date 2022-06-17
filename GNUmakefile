@@ -3,6 +3,7 @@ ifneq (,$(wildcard .env))
     export
 endif
 
+
 .env:
 	cp .env.template .env
 

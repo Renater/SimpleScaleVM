@@ -13,6 +13,7 @@ Variables:
 
 import os
 
+
 # Create Openstack environment parameters
 OPENSTACK_FLAVOR = os.getenv("OPENSTACK_FLAVOR", "d2-8")
 OPENSTACK_IMAGE = os.getenv("OPENSTACK_IMAGE", "Debian 11")

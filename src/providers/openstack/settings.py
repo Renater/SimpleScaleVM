@@ -1,0 +1,25 @@
+#!/usr/bin/python3
+"""
+Configure the Openstack provider.
+
+Variables:
+    OPENSTACK_FLAVOR
+    OPENSTACK_IMAGE
+    OPENSTACK_IP_VERSION
+    OPENSTACK_KEYPAIR
+    OPENSTACK_METADATA_KEY
+    OPENSTACK_METADATA_VALUE
+    OPENSTACK_NETWORK
+"""
+
+import os
+
+
+# Create Openstack environment parameters
+OPENSTACK_FLAVOR = os.getenv("OPENSTACK_FLAVOR", "d2-8")
+OPENSTACK_IMAGE = os.getenv("OPENSTACK_IMAGE", "Debian 11")
+OPENSTACK_IP_VERSION = int(os.getenv("OPENSTACK_IP_VERSION", "4"))
+OPENSTACK_KEYPAIR = os.getenv("OPENSTACK_KEYPAIR")
+OPENSTACK_METADATA_KEY = os.getenv("OPENSTACK_METADATA_KEY", "group")
+OPENSTACK_METADATA_VALUE = os.getenv("OPENSTACK_METADATA_VALUE", "scaled")
+OPENSTACK_NETWORK = os.getenv("OPENSTACK_NETWORK", "Ext-Net")

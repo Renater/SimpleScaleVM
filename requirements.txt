@@ -1,1 +1,2 @@
+pylint==2.14.1
 python-dotenv==0.20.0

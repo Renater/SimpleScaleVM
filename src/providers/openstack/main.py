@@ -11,6 +11,7 @@ import openstack
 from providers.openstack.settings import (
     OPENSTACK_FLAVOR,
     OPENSTACK_IMAGE,
+    OPENSTACK_IP_VERSION,
     OPENSTACK_KEYPAIR,
     OPENSTACK_METADATA_KEY,
     OPENSTACK_METADATA_VALUE,
@@ -37,7 +38,10 @@ class ProviderService(BaseProviderService):
                 OPENSTACK_METADATA_KEY in server["metadata"] and
                 server["metadata"][OPENSTACK_METADATA_KEY] == OPENSTACK_METADATA_VALUE
             ):
-                servers[server["id"]] = server["addresses"][OPENSTACK_NETWORK][0]["addr"]
+                for server_port in server["addresses"][OPENSTACK_NETWORK]:
+                    if server_port["version"] == OPENSTACK_IP_VERSION:
+                        servers[server["id"]] = server_port["addr"]
+                        break
 
         return servers
 

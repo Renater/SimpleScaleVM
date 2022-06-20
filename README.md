@@ -33,6 +33,7 @@ The following values should be overwritten to configure the connection to the Op
 * `OS_IDENTITY_API_VERSION`: version of the Openstack API.
 * `OPENSTACK_FLAVOR`: name of the flavor to use for the virtual machines.
 * `OPENSTACK_IMAGE`: name of the image to use for the virtual machines.
+* `OPENSTACK_IP_VERSION`: IP version to use for virtual machines.
 * `OPENSTACK_NETWORK`: name of the network to use for the virtual machines.
 * `OPENSTACK_METADATA_KEY`: metadata key to identify the scaled server pool.
 * `OPENSTACK_METADATA_VALUE`: metadata value to identify the scaled server pool.

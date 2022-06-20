@@ -4,16 +4,19 @@ LABEL maintainer="contact@renater.fr"
 
 ARG provider=openstack
 
+RUN useradd -m -s /bin/sh -d /src scaler
+USER scaler
+
 WORKDIR /requirements
 
-COPY requirements.txt common.txt
-COPY src/providers/${provider}/requirements.txt provider.txt
+COPY --chown=scaler requirements.txt common.txt
+COPY --chown=scaler src/providers/${provider}/requirements.txt provider.txt
 RUN pip install -r common.txt
 RUN pip install -r provider.txt
 
 WORKDIR /
 
-COPY src/ /src
+COPY --chown=scaler src/ /src
 
 EXPOSE 8000
 

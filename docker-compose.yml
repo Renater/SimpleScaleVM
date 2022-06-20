@@ -7,5 +7,5 @@ services:
     hostname: simplescalevm
     restart: always
     ports:
-      - "8000:8000"
+      - "${APP_PORT}:${APP_PORT}"
     env_file: .env

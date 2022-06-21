@@ -4,6 +4,7 @@ Define the virtual resource class.
 
 Classes:
     Resource
+    ResourceStatus
 """
 
 import enum

@@ -19,7 +19,12 @@ from providers.main import Provider
 
 if __name__ == "__main__":
     provider = Provider(PROVIDER)
-    scheduler = Scheduler(provider)
+    scheduler = Scheduler(provider, {
+        "protocol": RESOURCE_API_PROTOCOL,
+        "path": RESOURCE_API_PATH,
+        "capacity_key": RESOURCE_API_CAPACITY_KEY,
+        "termination_key": RESOURCE_API_TERMINATION_KEY,
+    })
     server = ServerLauncher(APP_HOST, APP_PORT)
 
     scheduler.start()

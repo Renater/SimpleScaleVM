@@ -5,7 +5,15 @@ Launch the autoscaling module.
 
 from server.launcher import ServerLauncher
 from scheduler.main import Scheduler
-from settings import APP_HOST, APP_PORT, PROVIDER
+from settings import (
+    APP_HOST,
+    APP_PORT,
+    PROVIDER,
+    RESOURCE_API_PROTOCOL,
+    RESOURCE_API_PATH,
+    RESOURCE_API_CAPACITY_KEY,
+    RESOURCE_API_TERMINATION_KEY,
+)
 from providers.main import Provider
 
 

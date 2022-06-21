@@ -15,6 +15,10 @@ Besides, the following values may be overwritten to configure the module:
 * `VERSION`: semantic version of the project (only used for releasing the Docker image).
 * `APP_HOST`: host of the HTTP server.
 * `APP_PORT`: port of the HTTP server.
+* `RESOURCE_API_PROTOCOL`: protocol to use to contact the API on virtual resources.
+* `RESOURCE_API_PATH`: path to use to contact the API on virtual resources.
+* `RESOURCE_API_CAPACITY_KEY`: key of the API response that corresponds to the number of available objects on the virtual resource.
+* `RESOURCE_API_TERMINATION_KEY`: key of the API response that corresponds to the boolean indicating if the virtual resource should be terminated.
 * `PROVIDER`: provider that is used to deploy virtual resources (the only available value is `openstack`).
 
 The environment variables that are specific to the providers are detailed in the following subsections.

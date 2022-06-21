@@ -6,7 +6,7 @@ Classes:
     ProviderService
 """
 
-from typing import Dict
+from typing import List
 import openstack
 from providers.openstack.settings import (
     OPENSTACK_FLAVOR,
@@ -18,6 +18,7 @@ from providers.openstack.settings import (
     OPENSTACK_NETWORK,
 )
 from providers.schema import BaseProviderService
+from providers.resource import Resource
 
 
 class ProviderService(BaseProviderService):
@@ -27,9 +28,9 @@ class ProviderService(BaseProviderService):
 
         self.connector = openstack.connect(cloud="envvars")
 
-    def list(self) -> Dict[str, str]:
+    def list(self) -> List[Resource]:
 
-        servers = {}
+        servers = []
 
         for server_object in self.connector.compute.servers():
             server = server_object.to_dict()
@@ -40,7 +41,8 @@ class ProviderService(BaseProviderService):
             ):
                 for server_port in server["addresses"][OPENSTACK_NETWORK]:
                     if server_port["version"] == OPENSTACK_IP_VERSION:
-                        servers[server["id"]] = server_port["addr"]
+                        resource = Resource(server["id"], server_port["addr"])
+                        servers.append(resource)
                         break
 
         return servers

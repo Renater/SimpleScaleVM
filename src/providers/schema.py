@@ -6,12 +6,17 @@ Functions:
     BaseProviderService
 """
 
+from typing import List
+from providers.resource import Resource
+
 
 class BaseProviderService:
     """Base of the provider services."""
 
-    def list(self):
+    def list(self) -> List[Resource]:
         """List all virtual machines in the autoscaling pool."""
+
+        return []
 
     def create(self, count: int):
         """Create a virtual machine."""

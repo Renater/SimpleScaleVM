@@ -18,7 +18,7 @@ from providers.openstack.settings import (
     OPENSTACK_NETWORK,
 )
 from providers.schema import BaseProviderService
-from providers.resource import Resource
+from providers.resource import Resource, ResourceStatus
 
 
 class ProviderService(BaseProviderService):
@@ -41,7 +41,19 @@ class ProviderService(BaseProviderService):
             ):
                 for server_port in server["addresses"][OPENSTACK_NETWORK]:
                     if server_port["version"] == OPENSTACK_IP_VERSION:
-                        resource = Resource(server["id"], server_port["addr"])
+                        # If a deletion order has been sent, do not count the resource
+                        if server["task_state"] == "deleting":
+                            break
+
+                        # Power state of the virtual resource
+                        # ref: https://docs.openstack.org/nova/latest/reference/vm-states.html
+                        server_status = ResourceStatus.ERROR
+                        if server["vm_state"] == "building":
+                            server_status = ResourceStatus.CREATING
+                        elif server["vm_state"] == "active":
+                            server_status = ResourceStatus.CREATED_UNKNOWN
+
+                        resource = Resource(server["id"], server_port["addr"], server_status)
                         servers.append(resource)
                         break
 

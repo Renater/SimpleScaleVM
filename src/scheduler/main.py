@@ -7,19 +7,20 @@ Classes:
 """
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from providers.main import Provider
+from scheduler.service import SchedulerService
 
-
-def job_example():
-    print("job running")
 
 class Scheduler():
     """Scheduler of the autoscaling module."""
 
     job_queue: BackgroundScheduler
+    service: SchedulerService
 
-    def __init__(self):
+    def __init__(self, provider: Provider):
+        self.service = SchedulerService(provider)
         self.job_queue = BackgroundScheduler()
-        self.job_queue.add_job(job_example, "interval", minutes=1)
+        self.job_queue.add_job(self.service.example, "interval", minutes=1)
 
     def start(self):
         """Start the scheduling of all jobs in the job queue."""

@@ -11,7 +11,7 @@ from providers.main import Provider
 
 if __name__ == "__main__":
     provider = Provider(PROVIDER)
-    scheduler = Scheduler()
+    scheduler = Scheduler(provider)
     server = ServerLauncher(APP_HOST, APP_PORT)
 
     scheduler.start()

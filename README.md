@@ -82,6 +82,23 @@ make release
 Note that each provider has its specific Docker image version which contains the provider requirements: the Docker tag format is `<provider>-<version>`.
 
 
+## Tests
+
+In order to be able to test the autoscaling module, a simple HTTP webserver that listens on all GET requests and returns resource API responses can be launched with the following command:
+
+```bash
+make mock
+```
+
+Besides, this webserver may be configured in the `tests/mock.env` file with the following environment variables:
+* `MOCK_HOST`: host of the HTTP server.
+* `MOCK_PORT`: port of the HTTP server.
+* `MOCK_CAPACITY_KEY`: key of the API response that corresponds to the number of available objects on the virtual resource.
+* `MOCK_TERMINATION_KEY`: key of the API response that corresponds to the boolean indicating if the virtual resource should be terminated.
+* `MOCK_CAPACITY_VALUE`: value linked to the `MOCK_CAPACITY_KEY` key.
+* `MOCK_TERMINATION_VALUE`: value linked to the `MOCK_TERMINATION_KEY` key.
+
+
 ## Licensing
 
 Apache License Version 2.0.

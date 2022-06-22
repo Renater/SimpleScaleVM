@@ -46,6 +46,7 @@ The following values should be overwritten to configure the connection to the Op
 * `OPENSTACK_METADATA_KEY`: metadata key to identify the scaled server pool.
 * `OPENSTACK_METADATA_VALUE`: metadata value to identify the scaled server pool.
 * `OPENSTACK_KEYPAIR`: name of the keypair that is provisioned on the virtual machines.
+* `OPENSTACK_CLOUD_INIT_FILE`: path to a cloud-init file to launch on virtual machines at creation.
 
 
 ## Installation

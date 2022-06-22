@@ -15,12 +15,14 @@ class APIService:
     """Service responsible to contact the API of replicas."""
 
     protocol: str
+    port: int
     path: str
     capacity_key: str
     termination_key: str
 
-    def __init__(self, protocol: str, path: str, capacity_key: str, termination_key: str):
+    def __init__(self, protocol: str, port: int, path: str, capacity_key: str, termination_key: str):
         self.protocol = protocol
+        self.port = port
         self.path = path
         self.capacity_key = capacity_key
         self.termination_key = termination_key
@@ -28,7 +30,7 @@ class APIService:
     def get_status(self, replica: Replica) -> Union[Dict[str, Union[int, bool]], None]:
         """Get the status of a replica."""
 
-        uri = f"{self.protocol}://{replica.address}{self.path}"
+        uri = f"{self.protocol}://{replica.address}:{self.port}{self.path}"
 
         try:
             response = requests.get(uri)

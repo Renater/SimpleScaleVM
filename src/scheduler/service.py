@@ -26,6 +26,7 @@ class SchedulerService:
         self.provider = provider
         self.api = APIService(
             replica_configuration["api_protocol"],
+            replica_configuration["api_port"],
             replica_configuration["api_path"],
             replica_configuration["api_capacity_key"],
             replica_configuration["api_termination_key"],

@@ -61,8 +61,8 @@ class SchedulerService:
                 # If the replica should be deleted, do it
                 if status["termination"]:
                     print((
-                        f"Scaling down: replica with ID {replica.identifier}"
-                        + " has been scheduled for deletion."
+                        "Scaling down (termination): replica with ID "
+                        + f"{replica.identifier} has been scheduled for deletion."
                     ))
                     self.provider.service.delete(replica.identifier)
                     continue

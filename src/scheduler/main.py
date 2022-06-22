@@ -6,7 +6,7 @@ Classes:
     Scheduler
 """
 
-from typing import Dict
+from typing import Dict, Union
 from apscheduler.schedulers.background import BackgroundScheduler
 from providers.main import Provider
 from scheduler.service import SchedulerService
@@ -18,8 +18,8 @@ class Scheduler():
     job_queue: BackgroundScheduler
     service: SchedulerService
 
-    def __init__(self, provider: Provider, api_configuration: Dict[str, str]):
-        self.service = SchedulerService(provider, api_configuration)
+    def __init__(self, provider: Provider, replica_configuration: Dict[str, Union[str, int]]):
+        self.service = SchedulerService(provider, replica_configuration)
         self.job_queue = BackgroundScheduler()
         self.job_queue.add_job(self.service.loop, "interval", minutes=1)
 

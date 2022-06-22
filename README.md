@@ -15,7 +15,10 @@ Besides, the following values may be overwritten to configure the module:
 * `VERSION`: semantic version of the project (only used for releasing the Docker image).
 * `APP_HOST`: host of the HTTP server.
 * `APP_PORT`: port of the HTTP server.
+* `REPLICA_CAPACITY`: total number of resources per replica.
+* `REPLICA_MIN_AVAILABLE_RESOURCES`: minimum number of resources that should be available at all times.
 * `REPLICA_API_PROTOCOL`: protocol to use to contact the API on replicas.
+* `REPLICA_API_PORT`: port to use to contact the API on replicas.
 * `REPLICA_API_PATH`: path to use to contact the API on replicas.
 * `REPLICA_API_CAPACITY_KEY`: key of the API response that corresponds to the number of available resources on the replica.
 * `REPLICA_API_TERMINATION_KEY`: key of the API response that corresponds to the boolean indicating if the replica should be terminated.

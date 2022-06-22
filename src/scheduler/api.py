@@ -8,6 +8,7 @@ Classes:
 
 from typing import Dict, Union
 import requests
+from providers.resource import Resource
 
 
 class APIService:
@@ -24,10 +25,10 @@ class APIService:
         self.capacity_key = capacity_key
         self.termination_key = termination_key
 
-    def get_status(self, host: str) -> Union[Dict[str, str], None]:
+    def get_status(self, resource: Resource) -> Union[Dict[str, Union[int, bool]], None]:
         """Get the status of a virtual resource."""
 
-        uri = f"{self.protocol}://{host}{self.path}"
+        uri = f"{self.protocol}://{resource.address}{self.path}"
 
         try:
             response = requests.get(uri)

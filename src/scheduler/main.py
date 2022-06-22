@@ -21,7 +21,7 @@ class Scheduler():
     def __init__(self, provider: Provider, api_configuration: Dict[str, str]):
         self.service = SchedulerService(provider, api_configuration)
         self.job_queue = BackgroundScheduler()
-        self.job_queue.add_job(self.service.example, "interval", minutes=1)
+        self.job_queue.add_job(self.service.loop, "interval", minutes=1)
 
     def start(self):
         """Start the scheduling of all jobs in the job queue."""

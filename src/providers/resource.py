@@ -15,8 +15,6 @@ class ResourceStatus(enum.Enum):
 
     CREATING = "CREATING"
     CREATED_UNKNOWN = "CREATED_UNKNOWN"
-    READY = "READY"
-    IN_USE = "IN_USE"
     ERROR = "ERROR"
 
 class Resource:

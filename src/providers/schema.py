@@ -7,13 +7,13 @@ Functions:
 """
 
 from typing import List
-from providers.resource import Resource
+from providers.replica import Replica
 
 
 class BaseProviderService:
     """Base of the provider services."""
 
-    def list(self) -> List[Resource]:
+    def list(self) -> List[Replica]:
         """List all virtual machines in the autoscaling pool."""
 
         return []

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Define the API service on virtual resources.
+Define the API service on replicas.
 
 Classes:
     APIService
@@ -8,11 +8,11 @@ Classes:
 
 from typing import Dict, Union
 import requests
-from providers.resource import Resource
+from providers.replica import Replica
 
 
 class APIService:
-    """Service responsible to contact the API of virtual resources."""
+    """Service responsible to contact the API of replicas."""
 
     protocol: str
     path: str
@@ -25,10 +25,10 @@ class APIService:
         self.capacity_key = capacity_key
         self.termination_key = termination_key
 
-    def get_status(self, resource: Resource) -> Union[Dict[str, Union[int, bool]], None]:
-        """Get the status of a virtual resource."""
+    def get_status(self, replica: Replica) -> Union[Dict[str, Union[int, bool]], None]:
+        """Get the status of a replica."""
 
-        uri = f"{self.protocol}://{resource.address}{self.path}"
+        uri = f"{self.protocol}://{replica.address}{self.path}"
 
         try:
             response = requests.get(uri)

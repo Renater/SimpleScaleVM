@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Mock a virtual resource webserver.
+Mock a replica webserver.
 
 Classes:
     RequestHandler
@@ -30,7 +30,7 @@ MOCK_CAPACITY_VALUE = int(os.getenv("MOCK_CAPACITY_VALUE", "0"))
 MOCK_TERMINATION_VALUE = (os.getenv("MOCK_TERMINATION_VALUE", "false") != "false")
 
 class RequestHandler(BaseHTTPRequestHandler):
-    """Request handler of the virtual resource webserver."""
+    """Request handler of the replica webserver."""
 
     def do_GET(self):  # pylint: disable=invalid-name
         """Respond to HTTP GET requests."""

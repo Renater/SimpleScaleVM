@@ -11,7 +11,7 @@ from providers.schema import BaseProviderService
 
 
 class Provider:
-    """Global virtual resource provider."""
+    """Global replica provider."""
 
     service: BaseProviderService
 

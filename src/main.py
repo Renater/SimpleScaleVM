@@ -9,10 +9,10 @@ from settings import (
     APP_HOST,
     APP_PORT,
     PROVIDER,
-    RESOURCE_API_PROTOCOL,
-    RESOURCE_API_PATH,
-    RESOURCE_API_CAPACITY_KEY,
-    RESOURCE_API_TERMINATION_KEY,
+    REPLICA_API_PROTOCOL,
+    REPLICA_API_PATH,
+    REPLICA_API_CAPACITY_KEY,
+    REPLICA_API_TERMINATION_KEY,
 )
 from providers.main import Provider
 
@@ -20,10 +20,10 @@ from providers.main import Provider
 if __name__ == "__main__":
     provider = Provider(PROVIDER)
     scheduler = Scheduler(provider, {
-        "protocol": RESOURCE_API_PROTOCOL,
-        "path": RESOURCE_API_PATH,
-        "capacity_key": RESOURCE_API_CAPACITY_KEY,
-        "termination_key": RESOURCE_API_TERMINATION_KEY,
+        "protocol": REPLICA_API_PROTOCOL,
+        "path": REPLICA_API_PATH,
+        "capacity_key": REPLICA_API_CAPACITY_KEY,
+        "termination_key": REPLICA_API_TERMINATION_KEY,
     })
     server = ServerLauncher(APP_HOST, APP_PORT)
 

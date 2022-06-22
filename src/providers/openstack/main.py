@@ -18,7 +18,7 @@ from providers.openstack.settings import (
     OPENSTACK_NETWORK,
 )
 from providers.schema import BaseProviderService
-from providers.resource import Resource, ResourceStatus
+from providers.replica import Replica, ReplicaStatus
 
 
 class ProviderService(BaseProviderService):
@@ -28,7 +28,7 @@ class ProviderService(BaseProviderService):
 
         self.connector = openstack.connect(cloud="envvars")
 
-    def list(self) -> List[Resource]:
+    def list(self) -> List[Replica]:
 
         servers = []
 
@@ -41,20 +41,20 @@ class ProviderService(BaseProviderService):
             ):
                 for server_port in server["addresses"][OPENSTACK_NETWORK]:
                     if server_port["version"] == OPENSTACK_IP_VERSION:
-                        # If a deletion order has been sent, do not count the resource
+                        # If a deletion order has been sent, do not count the virtual machine
                         if server["task_state"] == "deleting":
                             break
 
-                        # Power state of the virtual resource
+                        # Power state of the virtual machine
                         # ref: https://docs.openstack.org/nova/latest/reference/vm-states.html
-                        server_status = ResourceStatus.ERROR
+                        server_status = ReplicaStatus.ERROR
                         if server["vm_state"] == "building":
-                            server_status = ResourceStatus.CREATING
+                            server_status = ReplicaStatus.CREATING
                         elif server["vm_state"] == "active":
-                            server_status = ResourceStatus.CREATED_UNKNOWN
+                            server_status = ReplicaStatus.CREATED_UNKNOWN
 
-                        resource = Resource(server["id"], server_port["addr"], server_status)
-                        servers.append(resource)
+                        replica = Replica(server["id"], server_port["addr"], server_status)
+                        servers.append(replica)
                         break
 
         return servers

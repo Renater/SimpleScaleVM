@@ -7,6 +7,7 @@ Classes:
 """
 
 from typing import List
+from threading import Thread
 import openstack
 from providers.openstack.settings import (
     OPENSTACK_FLAVOR,
@@ -61,16 +62,19 @@ class ProviderService(BaseProviderService):
 
     def create(self, count: int = 1):
 
-        self.connector.create_server(
-            name="gateway",
-            image=OPENSTACK_IMAGE,
-            flavor=OPENSTACK_FLAVOR,
-            key_name=OPENSTACK_KEYPAIR,
-            network=OPENSTACK_NETWORK,
-            meta={ OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_VALUE },
-            min_count=count,
-            max_count=count,
-        )
+        def creation_function():
+            return self.connector.create_server(
+                name="gateway",
+                image=OPENSTACK_IMAGE,
+                flavor=OPENSTACK_FLAVOR,
+                key_name=OPENSTACK_KEYPAIR,
+                network=OPENSTACK_NETWORK,
+                meta={ OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_VALUE },
+            )
+
+        for _ in range(count):
+            thread = Thread(target=creation_function)
+            thread.start()
 
     def delete(self, server_id: str):
 

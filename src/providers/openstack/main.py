@@ -17,6 +17,7 @@ from providers.openstack.settings import (
     OPENSTACK_METADATA_KEY,
     OPENSTACK_METADATA_VALUE,
     OPENSTACK_NETWORK,
+    OPENSTACK_CLOUD_INIT_FILE,
 )
 from providers.schema import BaseProviderService
 from providers.replica import Replica, ReplicaStatus
@@ -63,14 +64,24 @@ class ProviderService(BaseProviderService):
     def create(self, count: int = 1):
 
         def creation_function():
-            return self.connector.create_server(
-                name="gateway",
-                image=OPENSTACK_IMAGE,
-                flavor=OPENSTACK_FLAVOR,
-                key_name=OPENSTACK_KEYPAIR,
-                network=OPENSTACK_NETWORK,
-                meta={ OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_VALUE },
-            )
+            server_configuration = {
+                "name": "server",
+                "image": OPENSTACK_IMAGE,
+                "flavor": OPENSTACK_FLAVOR,
+                "network": OPENSTACK_NETWORK,
+                "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_VALUE },
+            }
+
+            # Add optional key pair
+            if OPENSTACK_KEYPAIR:
+                server_configuration["key_name"] = OPENSTACK_KEYPAIR
+
+            # Add optional cloud-init
+            if OPENSTACK_CLOUD_INIT_FILE:
+                with open(OPENSTACK_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
+                    server_configuration["userdata"] = cloud_init_file.read()
+
+            return self.connector.create_server(**server_configuration)
 
         for _ in range(count):
             thread = Thread(target=creation_function)

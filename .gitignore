@@ -1,3 +1,4 @@
 .env
 env/
+tests/mock.env
 __pycache__/

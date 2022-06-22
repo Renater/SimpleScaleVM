@@ -6,7 +6,8 @@ Classes:
     ProviderService
 """
 
-from typing import Dict
+from typing import List
+from threading import Thread
 import openstack
 from providers.openstack.settings import (
     OPENSTACK_FLAVOR,
@@ -18,6 +19,7 @@ from providers.openstack.settings import (
     OPENSTACK_NETWORK,
 )
 from providers.schema import BaseProviderService
+from providers.replica import Replica, ReplicaStatus
 
 
 class ProviderService(BaseProviderService):
@@ -27,9 +29,9 @@ class ProviderService(BaseProviderService):
 
         self.connector = openstack.connect(cloud="envvars")
 
-    def list(self) -> Dict[str, str]:
+    def list(self) -> List[Replica]:
 
-        servers = {}
+        servers = []
 
         for server_object in self.connector.compute.servers():
             server = server_object.to_dict()
@@ -40,23 +42,39 @@ class ProviderService(BaseProviderService):
             ):
                 for server_port in server["addresses"][OPENSTACK_NETWORK]:
                     if server_port["version"] == OPENSTACK_IP_VERSION:
-                        servers[server["id"]] = server_port["addr"]
+                        # If a deletion order has been sent, do not count the virtual machine
+                        if server["task_state"] == "deleting":
+                            break
+
+                        # Power state of the virtual machine
+                        # ref: https://docs.openstack.org/nova/latest/reference/vm-states.html
+                        server_status = ReplicaStatus.ERROR
+                        if server["vm_state"] == "building":
+                            server_status = ReplicaStatus.CREATING
+                        elif server["vm_state"] == "active":
+                            server_status = ReplicaStatus.CREATED_UNKNOWN
+
+                        replica = Replica(server["id"], server_port["addr"], server_status)
+                        servers.append(replica)
                         break
 
         return servers
 
     def create(self, count: int = 1):
 
-        self.connector.create_server(
-            name="gateway",
-            image=OPENSTACK_IMAGE,
-            flavor=OPENSTACK_FLAVOR,
-            key_name=OPENSTACK_KEYPAIR,
-            network=OPENSTACK_NETWORK,
-            meta={ OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_VALUE },
-            min_count=count,
-            max_count=count,
-        )
+        def creation_function():
+            return self.connector.create_server(
+                name="gateway",
+                image=OPENSTACK_IMAGE,
+                flavor=OPENSTACK_FLAVOR,
+                key_name=OPENSTACK_KEYPAIR,
+                network=OPENSTACK_NETWORK,
+                meta={ OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_VALUE },
+            )
+
+        for _ in range(count):
+            thread = Thread(target=creation_function)
+            thread.start()
 
     def delete(self, server_id: str):
 

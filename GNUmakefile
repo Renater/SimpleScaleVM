@@ -23,6 +23,10 @@ install: env
 lint:
 	env/bin/pylint --ignore-patterns=env/* .
 
+.PHONY: mock
+mock: tests/mock.env
+	python3 tests/mock.py
+
 .PHONY: release
 release: build
 	docker tag renater/simplescalevm:${PROVIDER}-test renater/simplescalevm:${PROVIDER}-latest
@@ -41,3 +45,6 @@ start:
 .PHONY: start-docker
 start-docker: build
 	docker-compose up -d
+
+tests/mock.env:
+	cp tests/mock.env.template tests/mock.env

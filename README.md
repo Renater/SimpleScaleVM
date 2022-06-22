@@ -1,6 +1,6 @@
 # SimpleScaleVM
 
-Python module to manage the autoscaling of a cluster of virtual machines.
+This repository hosts a Python module to manage the autoscaling of a cluster of virtual machines called **replicas**. These replicas each hold a certain number of **resources** that constitute the autoscaling cost of replicas.
 
 
 ## Configuration
@@ -15,7 +15,14 @@ Besides, the following values may be overwritten to configure the module:
 * `VERSION`: semantic version of the project (only used for releasing the Docker image).
 * `APP_HOST`: host of the HTTP server.
 * `APP_PORT`: port of the HTTP server.
-* `PROVIDER`: provider that is used to deploy virtual resources (the only available value is `openstack`).
+* `REPLICA_CAPACITY`: total number of resources per replica.
+* `REPLICA_MIN_AVAILABLE_RESOURCES`: minimum number of resources that should be available at all times.
+* `REPLICA_API_PROTOCOL`: protocol to use to contact the API on replicas.
+* `REPLICA_API_PORT`: port to use to contact the API on replicas.
+* `REPLICA_API_PATH`: path to use to contact the API on replicas.
+* `REPLICA_API_CAPACITY_KEY`: key of the API response that corresponds to the number of available resources on the replica.
+* `REPLICA_API_TERMINATION_KEY`: key of the API response that corresponds to the boolean indicating if the replica should be terminated.
+* `PROVIDER`: provider that is used to deploy replicas (the only available value is `openstack`).
 
 The environment variables that are specific to the providers are detailed in the following subsections.
 
@@ -76,6 +83,23 @@ make release
 ```
 
 Note that each provider has its specific Docker image version which contains the provider requirements: the Docker tag format is `<provider>-<version>`.
+
+
+## Tests
+
+In order to be able to test the autoscaling module, a simple HTTP webserver that listens on all GET requests and returns replica API responses can be launched with the following command:
+
+```bash
+make mock
+```
+
+Besides, this webserver may be configured in the `tests/mock.env` file with the following environment variables:
+* `MOCK_HOST`: host of the HTTP server.
+* `MOCK_PORT`: port of the HTTP server.
+* `MOCK_CAPACITY_KEY`: key of the API response that corresponds to the number of available resources on the replica.
+* `MOCK_TERMINATION_KEY`: key of the API response that corresponds to the boolean indicating if the replica should be terminated.
+* `MOCK_CAPACITY_VALUE`: value linked to the `MOCK_CAPACITY_KEY` key.
+* `MOCK_TERMINATION_VALUE`: value linked to the `MOCK_TERMINATION_KEY` key.
 
 
 ## Licensing

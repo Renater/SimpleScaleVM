@@ -1,0 +1,3 @@
+#!/bin/sh
+
+echo "Cloud-init executed with success" > /cloud-init.log

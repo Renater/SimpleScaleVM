@@ -9,3 +9,5 @@ services:
     ports:
       - "${APP_PORT}:${APP_PORT}"
     env_file: .env
+    volumes:
+      - ./cloud-init.sh:/cloud-init.sh

@@ -24,13 +24,13 @@ class SchedulerService:
 
     def __init__(self, provider: Provider, replica_configuration: Dict[str, Union[str, int]]):
         self.provider = provider
-        self.api = APIService(
-            replica_configuration["api_protocol"],
-            replica_configuration["api_port"],
-            replica_configuration["api_path"],
-            replica_configuration["api_capacity_key"],
-            replica_configuration["api_termination_key"],
-        )
+        self.api = APIService({
+            "protocol": replica_configuration["api_protocol"],
+            "port": replica_configuration["api_port"],
+            "path": replica_configuration["api_path"],
+            "capacity_key": replica_configuration["api_capacity_key"],
+            "termination_key": replica_configuration["api_termination_key"],
+        })
         self.replica_capacity = replica_configuration["capacity"]
         self.min_available_resources = replica_configuration["min_available_resources"]
 

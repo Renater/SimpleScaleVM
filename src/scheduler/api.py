@@ -20,12 +20,12 @@ class APIService:
     capacity_key: str
     termination_key: str
 
-    def __init__(self, protocol: str, port: int, path: str, capacity_key: str, termination_key: str):
-        self.protocol = protocol
-        self.port = port
-        self.path = path
-        self.capacity_key = capacity_key
-        self.termination_key = termination_key
+    def __init__(self, api_configuration: Dict[str, Union[str, int]]):
+        self.protocol = api_configuration["protocol"]
+        self.port = api_configuration["port"]
+        self.path = api_configuration["path"]
+        self.capacity_key = api_configuration["capacity_key"]
+        self.termination_key = api_configuration["termination_key"]
 
     def get_status(self, replica: Replica) -> Union[Dict[str, Union[int, bool]], None]:
         """Get the status of a replica."""

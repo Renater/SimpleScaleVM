@@ -11,6 +11,9 @@ endif
 build:
 	docker build -t renater/simplescalevm:${PROVIDER}-test --build-arg provider=${PROVIDER} .
 
+cloud-init.sh:
+	cp cloud-init.sh.example cloud-init.sh
+
 env:
 	virtualenv env
 
@@ -43,7 +46,7 @@ start:
 	env/bin/python3 src/main.py
 
 .PHONY: start-docker
-start-docker: build
+start-docker: build cloud-init.sh
 	docker-compose up -d
 
 tests/mock.env:

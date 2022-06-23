@@ -1,4 +1,5 @@
 .env
+cloud-init.sh
 env/
 tests/mock.env
 __pycache__/

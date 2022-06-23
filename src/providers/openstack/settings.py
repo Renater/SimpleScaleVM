@@ -3,6 +3,7 @@
 Configure the Openstack provider.
 
 Variables:
+    OPENSTACK_CLOUD_INIT_FILE
     OPENSTACK_FLAVOR
     OPENSTACK_IMAGE
     OPENSTACK_IP_VERSION
@@ -16,6 +17,7 @@ import os
 
 
 # Create Openstack environment parameters
+OPENSTACK_CLOUD_INIT_FILE = os.getenv("OPENSTACK_CLOUD_INIT_FILE")
 OPENSTACK_FLAVOR = os.getenv("OPENSTACK_FLAVOR", "d2-8")
 OPENSTACK_IMAGE = os.getenv("OPENSTACK_IMAGE", "Debian 11")
 OPENSTACK_IP_VERSION = int(os.getenv("OPENSTACK_IP_VERSION", "4"))

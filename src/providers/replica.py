@@ -8,6 +8,7 @@ Classes:
 """
 
 import enum
+from typing import Union
 
 
 class ReplicaStatus(enum.Enum):
@@ -21,7 +22,7 @@ class Replica:
     """Replica representation."""
 
     identifier: str
-    address: str
+    address: Union[str, None]
     status: ReplicaStatus
 
     def __init__(self, identifier: str, address: str, status: ReplicaStatus):

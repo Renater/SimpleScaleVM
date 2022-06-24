@@ -41,6 +41,12 @@ class ProviderService(BaseProviderService):
                 OPENSTACK_METADATA_KEY in server["metadata"] and
                 server["metadata"][OPENSTACK_METADATA_KEY] == OPENSTACK_METADATA_VALUE
             ):
+                # If the virtual machine does not have any IP address yet, count it as creating
+                if OPENSTACK_NETWORK not in server["addresses"]:
+                    replica = Replica(server["id"], None, ReplicaStatus.CREATING)
+                    servers.append(replica)
+                    continue
+
                 for server_port in server["addresses"][OPENSTACK_NETWORK]:
                     if server_port["version"] == OPENSTACK_IP_VERSION:
                         # If a deletion order has been sent, do not count the virtual machine

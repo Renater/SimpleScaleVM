@@ -41,23 +41,36 @@ class ProviderService(BaseProviderService):
                 OPENSTACK_METADATA_KEY in server["metadata"] and
                 server["metadata"][OPENSTACK_METADATA_KEY] == OPENSTACK_METADATA_VALUE
             ):
-                for server_port in server["addresses"][OPENSTACK_NETWORK]:
-                    if server_port["version"] == OPENSTACK_IP_VERSION:
-                        # If a deletion order has been sent, do not count the virtual machine
-                        if server["task_state"] == "deleting":
+                # If a deletion order has been sent, do not count the virtual machine
+                if server["task_state"] == "deleting":
+                    continue
+
+                server_status = ReplicaStatus.ERROR
+                server_address = None
+
+                # Power state of the virtual machine
+                # ref: https://docs.openstack.org/nova/latest/reference/vm-states.html
+                if server["vm_state"] == "building":
+                    server_status = ReplicaStatus.CREATING
+                elif server["vm_state"] == "active":
+                    server_status = ReplicaStatus.CREATED_UNKNOWN
+
+                # If an active VM does not have any IP address yet, count it as creating
+                if (
+                    OPENSTACK_NETWORK not in server["addresses"] and
+                    server_status == ReplicaStatus.CREATED_UNKNOWN
+                ):
+                    server_status = ReplicaStatus.CREATING
+
+                # Get the IP address of the virtual machine
+                elif OPENSTACK_NETWORK in server["addresses"]:
+                    for server_port in server["addresses"][OPENSTACK_NETWORK]:
+                        if server_port["version"] == OPENSTACK_IP_VERSION:
+                            server_address = server_port["addr"]
                             break
 
-                        # Power state of the virtual machine
-                        # ref: https://docs.openstack.org/nova/latest/reference/vm-states.html
-                        server_status = ReplicaStatus.ERROR
-                        if server["vm_state"] == "building":
-                            server_status = ReplicaStatus.CREATING
-                        elif server["vm_state"] == "active":
-                            server_status = ReplicaStatus.CREATED_UNKNOWN
-
-                        replica = Replica(server["id"], server_port["addr"], server_status)
-                        servers.append(replica)
-                        break
+                replica = Replica(server["id"], server_address, server_status)
+                servers.append(replica)
 
         return servers
 

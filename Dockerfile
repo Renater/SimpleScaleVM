@@ -18,6 +18,8 @@ WORKDIR /
 
 COPY --chown=scaler src/ /src
 
+ENV PYTHONUNBUFFERED 1
+
 EXPOSE 8000
 
 ENTRYPOINT [ "python", "src/main.py" ]

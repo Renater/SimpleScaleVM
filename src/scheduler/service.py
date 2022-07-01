@@ -39,16 +39,14 @@ class SchedulerService:
         create a number of replicas to always have the minimum number of available resources."""
 
         replicas = self.provider.service.list()
+        healthy_replicas = []
+        replicas_to_delete = []
         available_resources = 0
 
         for replica in replicas:
-            # If the replica is in error state, delete it
+            # If the replica is in error state, add it to the deletion list
             if replica.status == ReplicaStatus.ERROR:
-                print((
-                    f"Scaling down (error): replica with ID {replica.identifier}"
-                    + " has been scheduled for deletion."
-                ))
-                self.provider.service.delete(replica.identifier)
+                replicas_to_delete.append((replica, "error"))
                 continue
 
             # If the replica is creating, add the potential resources to the count
@@ -56,19 +54,36 @@ class SchedulerService:
                 available_resources += self.replica_capacity
                 continue
 
+            # Check the status of the replica
             status = self.api.get_status(replica)
             if status:
-                # If the replica should be deleted, do it
                 if status["termination"]:
-                    print((
-                        "Scaling down (termination): replica with ID "
-                        + f"{replica.identifier} has been scheduled for deletion."
-                    ))
-                    self.provider.service.delete(replica.identifier)
-                    continue
+                    replicas_to_delete.append((replica, "termination"))
+                else:
+                    healthy_replicas.append(replica)
+                    available_resources += status["capacity"]
 
-                # Add the available resources to the global count
-                available_resources += status["capacity"]
+        # Find all replicas without external address
+        available_replicas = [
+            replica for replica in healthy_replicas if not replica.external_address
+        ]
+
+        for replica, reason in replicas_to_delete:
+            print((
+                f"Scaling down ({reason}): replica with ID "
+                + f"{replica.identifier} has been scheduled for deletion."
+            ))
+
+            migration_replica = None
+            # If replica has an external address, reassign it
+            if replica.external_address:
+                migration_replica = available_replicas.pop()
+                print((
+                    f"Address {replica.external_address} reassigned from replica with ID "
+                    + f"{replica.identifier} to replica with ID {migration_replica.identifier}."
+                ))
+
+            self.provider.service.delete(replica, migration_replica)
 
         # If there are not enough available resources, create replicas
         if available_resources < self.min_available_resources:

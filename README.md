@@ -22,6 +22,7 @@ Besides, the following values may be overwritten to configure the module:
 * `REPLICA_API_PATH`: path to use to contact the API on replicas.
 * `REPLICA_API_CAPACITY_KEY`: key of the API response that corresponds to the number of available resources on the replica.
 * `REPLICA_API_TERMINATION_KEY`: key of the API response that corresponds to the boolean indicating if the replica should be terminated.
+* `EXTERNAL_ADDRESS_MANAGEMENT`: boolean that indicates if the scaler should manage external addresses.
 * `PROVIDER`: provider that is used to deploy replicas (the only available value is `openstack`).
 
 The environment variables that are specific to the providers are detailed in the following subsections.
@@ -45,7 +46,7 @@ The following values should be overwritten to configure the connection to the Op
 * `OPENSTACK_NETWORK`: name of the network to use for the virtual machines.
 * `OPENSTACK_METADATA_KEY`: metadata key to identify the scaled server pool.
 * `OPENSTACK_METADATA_VALUE`: metadata value to identify the scaled server pool.
-* `OPENSTACK_FLOATING_IP_DESCRIPTION`: description of the floating IPs that should be assigned.
+* `OPENSTACK_FLOATING_IP_DESCRIPTION`: description of the floating IPs that should be assigned (only used when `EXTERNAL_ADDRESS_MANAGEMENT` is enabled).
 * `OPENSTACK_KEYPAIR`: name of the keypair that is provisioned on the virtual machines.
 * `OPENSTACK_CLOUD_INIT_FILE`: path to a cloud-init file to launch on virtual machines at creation.
 

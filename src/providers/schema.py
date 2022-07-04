@@ -13,6 +13,11 @@ from providers.replica import Replica
 class BaseProviderService:
     """Base of the provider services."""
 
+    external_address_management: bool
+
+    def __init__(self, external_address_management: bool):
+        self.external_address_management = external_address_management
+
     def list(self) -> List[Replica]:
         """List all virtual machines in the autoscaling pool."""
 

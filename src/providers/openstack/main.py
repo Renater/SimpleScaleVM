@@ -27,24 +27,25 @@ from providers.replica import Replica, ReplicaStatus
 class ProviderService(BaseProviderService):
     """Service of the Openstack provider."""
 
-    def __init__(self):
-
+    def __init__(self, external_address_management: bool):
+        super().__init__(external_address_management)
         self.connector = openstack.connect(cloud="envvars")
 
     def list(self) -> List[Replica]:
 
         servers = []
 
-        # Search for external addresses
+        # Search for external addresses if `EXTERNAL_ADDRESS_MANAGEMENT` is enabled
         external_addresses = {}
-        for floating_ip_object in self.connector.list_floating_ips():
-            if (
-                floating_ip_object.description == OPENSTACK_FLOATING_IP_DESCRIPTION
-                and floating_ip_object.attached
-            ):
-                external_addresses[
-                    floating_ip_object.fixed_ip_address,
-                ] = floating_ip_object.floating_ip_address
+        if self.external_address_management:
+            for floating_ip_object in self.connector.list_floating_ips():
+                if (
+                    floating_ip_object.description == OPENSTACK_FLOATING_IP_DESCRIPTION
+                    and floating_ip_object.attached
+                ):
+                    external_addresses[
+                        floating_ip_object.fixed_ip_address,
+                    ] = floating_ip_object.floating_ip_address
 
         for server_object in self.connector.compute.servers():
             server = server_object.to_dict()
@@ -86,7 +87,12 @@ class ProviderService(BaseProviderService):
                             # Set the external address property
                             server_external_address = external_addresses.get(server_address, None)
 
-                replica = Replica(server["id"], server_status, server_address, server_external_address)
+                replica = Replica(
+                    server["id"],
+                    server_status,
+                    server_address,
+                    server_external_address
+                )
                 servers.append(replica)
 
         return servers
@@ -132,6 +138,10 @@ class ProviderService(BaseProviderService):
         self.connector.delete_server(replica.identifier)
 
     def assign(self, replicas: List[Replica]) -> Dict[str, Replica]:
+
+        # Return an empty dictionnary in case the `EXTERNAL_ADDRESS_MANAGEMENT` option is disabled
+        if not self.external_address_management:
+            return {}
 
         assignments = {}
 

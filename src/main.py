@@ -8,6 +8,7 @@ from scheduler.main import Scheduler
 from settings import (
     APP_HOST,
     APP_PORT,
+    EXTERNAL_ADDRESS_MANAGEMENT,
     PROVIDER,
     REPLICA_CAPACITY,
     REPLICA_MIN_AVAILABLE_RESOURCES,
@@ -21,7 +22,7 @@ from providers.main import Provider
 
 
 if __name__ == "__main__":
-    provider = Provider(PROVIDER)
+    provider = Provider(PROVIDER, EXTERNAL_ADDRESS_MANAGEMENT)
     scheduler = Scheduler(provider, {
         "capacity": REPLICA_CAPACITY,
         "min_available_resources": REPLICA_MIN_AVAILABLE_RESOURCES,

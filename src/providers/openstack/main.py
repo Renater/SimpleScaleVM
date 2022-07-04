@@ -6,7 +6,7 @@ Classes:
     ProviderService
 """
 
-from typing import List, Union
+from typing import Dict, List, Union
 from threading import Thread
 import openstack
 from providers.openstack.settings import (
@@ -38,8 +38,13 @@ class ProviderService(BaseProviderService):
         # Search for external addresses
         external_addresses = {}
         for floating_ip_object in self.connector.list_floating_ips():
-            if floating_ip_object.description == OPENSTACK_FLOATING_IP_DESCRIPTION and floating_ip_object.attached:
-                external_addresses[floating_ip_object.fixed_ip_address] = floating_ip_object.floating_ip_address
+            if (
+                floating_ip_object.description == OPENSTACK_FLOATING_IP_DESCRIPTION
+                and floating_ip_object.attached
+            ):
+                external_addresses[
+                    floating_ip_object.fixed_ip_address,
+                ] = floating_ip_object.floating_ip_address
 
         for server_object in self.connector.compute.servers():
             server = server_object.to_dict()
@@ -72,7 +77,10 @@ class ProviderService(BaseProviderService):
                 # Get the IP address of the virtual machine
                 elif OPENSTACK_NETWORK in server["addresses"]:
                     for server_port in server["addresses"][OPENSTACK_NETWORK]:
-                        if server_port["version"] == OPENSTACK_IP_VERSION and server_port["OS-EXT-IPS:type"] == "fixed":
+                        if (
+                            server_port["version"] == OPENSTACK_IP_VERSION
+                            and server_port["OS-EXT-IPS:type"] == "fixed"
+                        ):
                             server_address = server_port["addr"]
 
                             # Set the external address property
@@ -116,10 +124,35 @@ class ProviderService(BaseProviderService):
             self.connector.detach_ip_from_server(replica.identifier, floating_ip_object.id)
 
             if migration_replica:
-                migration_server_object = self.connector.get_server_by_id(migration_replica.identifier)
+                migration_server_object = self.connector.get_server_by_id(
+                    migration_replica.identifier,
+                )
                 self.connector.add_ip_list(migration_server_object, replica.external_address)
 
         self.connector.delete_server(replica.identifier)
+
+    def assign(self, replicas: List[Replica]) -> Dict[str, Replica]:
+
+        assignments = {}
+
+        available_addresses = []
+        for floating_ip_object in self.connector.list_floating_ips():
+            if (
+                floating_ip_object.description == OPENSTACK_FLOATING_IP_DESCRIPTION
+                and not floating_ip_object.attached
+            ):
+                available_addresses.append(floating_ip_object.floating_ip_address)
+
+        for address in available_addresses:
+            if len(replicas) > 0:
+                replica = replicas.pop()
+                replica_object = self.connector.get_server_by_id(replica.identifier)
+                self.connector.add_ip_list(replica_object, address)
+                assignments[address] = replica
+            else:
+                break
+
+        return assignments
 
     def close(self):
 

@@ -6,7 +6,7 @@ Functions:
     BaseProviderService
 """
 
-from typing import List, Union
+from typing import Dict, List, Union
 from providers.replica import Replica
 
 
@@ -21,8 +21,11 @@ class BaseProviderService:
     def create(self, count: int):
         """Create a virtual machine."""
 
-    def delete(self, server: Replica, migration_replica: Union[Replica, None] = None):
+    def delete(self, replica: Replica, migration_replica: Union[Replica, None] = None):
         """Delete a virtual machine."""
+
+    def assign(self, replicas: List[Replica]) -> Dict[str, Replica]:
+        """Assign available external addresses to replicas."""
 
     def close(self):
         """Close all connections linked to the provider."""

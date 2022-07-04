@@ -11,6 +11,7 @@ from threading import Thread
 import openstack
 from providers.openstack.settings import (
     OPENSTACK_FLAVOR,
+    OPENSTACK_FLOATING_IP_DESCRIPTION,
     OPENSTACK_IMAGE,
     OPENSTACK_IP_VERSION,
     OPENSTACK_KEYPAIR,
@@ -37,7 +38,7 @@ class ProviderService(BaseProviderService):
         # Search for external addresses
         external_addresses = {}
         for floating_ip_object in self.connector.list_floating_ips():
-            if floating_ip_object.description == "example" and floating_ip_object.attached:
+            if floating_ip_object.description == OPENSTACK_FLOATING_IP_DESCRIPTION and floating_ip_object.attached:
                 external_addresses[floating_ip_object.fixed_ip_address] = floating_ip_object.floating_ip_address
 
         for server_object in self.connector.compute.servers():

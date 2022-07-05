@@ -76,7 +76,7 @@ class SchedulerService:
 
             migration_replica = None
             # If replica has an external address, reassign it
-            if replica.external_address:
+            if replica.external_address and len(available_replicas) > 0:
                 migration_replica = available_replicas.pop()
                 print((
                     f"Address {replica.external_address} reassigned from replica with ID "

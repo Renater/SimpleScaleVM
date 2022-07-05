@@ -44,7 +44,7 @@ class ProviderService(BaseProviderService):
                     and floating_ip_object.attached
                 ):
                     external_addresses[
-                        floating_ip_object.fixed_ip_address,
+                        floating_ip_object.fixed_ip_address
                     ] = floating_ip_object.floating_ip_address
 
         for server_object in self.connector.compute.servers():

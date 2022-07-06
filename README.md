@@ -1,6 +1,6 @@
 # SimpleScaleVM
 
-This repository hosts a Python module to manage the autoscaling of a cluster of virtual machines called **replicas**. These replicas each hold a certain number of **resources** that constitute the autoscaling cost of replicas.
+This repository hosts a Python module to manage the autoscaling of a cluster of virtual instances called **replicas**. The full explanation of the functioning of this module is described in [the documentation directory](./docs/simplescalevm-in-depth.md).
 
 
 ## Configuration

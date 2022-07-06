@@ -1,19 +1,19 @@
 # Quick reference
 
--	**Maintained by**:
-	[Renater](https://github.com/Renater) (contact@renater.fr)
+-   **Maintained by**:
+    [Renater](https://github.com/Renater) (contact@renater.fr)
 
--	**Where to get help**:
-	[the SimpleScaleVM official repository](https://github.com/Renater/SimpleScaleVM)
+-   **Where to get help**:
+    [the SimpleScaleVM official repository](https://github.com/Renater/SimpleScaleVM)
 
--	**Where to file issues**:
-	[https://github.com/Renater/SimpleScaleVM/issues](https://github.com/Renater/SimpleScaleVM/issues)
+-   **Where to file issues**:
+    [https://github.com/Renater/SimpleScaleVM/issues](https://github.com/Renater/SimpleScaleVM/issues)
 
--	**Supported architecture**:
-	`amd64`
+-   **Supported architecture**:
+    `amd64`
 
--	**Source of this description**:
-	[documentation on the SimpleScaleVM repository](https://github.com/Renater/SimpleScaleVM/tree/main/docs/dockerhub.md)
+-   **Source of this description**:
+    [documentation on the SimpleScaleVM repository](https://github.com/Renater/SimpleScaleVM/tree/main/docs/dockerhub.md)
 
 # Supported tags
 
@@ -25,9 +25,9 @@
 
 -   `openstack-1.1.0`
 
--	   `openstack-1.0.0`, `openstack-1.0`
+-   `openstack-1.0.0`, `openstack-1.0`
 
--	   `openstack-0.1.0`, `openstack-0.1`, `openstack-0` (pre-release)
+-   `openstack-0.1.0`, `openstack-0.1`, `openstack-0` (pre-release)
 
 
 # What is SimpleScaleVM?

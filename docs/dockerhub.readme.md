@@ -46,6 +46,8 @@ SimpleScaleVM is a module written in Python that manages the scaling of a cluste
 -   **External address management**:
     The module includes a _Keepalived-like_ optional feature that makes sure a pool of external addresses are assigned to healthy replicas.
 
+The full explanation of the functioning of the module is described in [the documentation part of the GitHub repository](https://github.com/Renater/SimpleScaleVM/blob/main/docs/simplescalevm-in-depth.md).
+
 
 # How to use this image?
 

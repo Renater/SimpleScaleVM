@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Set the OpenStack provider for the autoscaling module.
+Set the OpenStack provider for the scaling module.
 
 Classes:
     ProviderService
@@ -10,15 +10,10 @@ from typing import Dict, List, Union
 from threading import Thread
 import openstack
 from providers.openstack.settings import (
-    OPENSTACK_FLAVOR,
     OPENSTACK_FLOATING_IP_DESCRIPTION,
-    OPENSTACK_IMAGE,
     OPENSTACK_IP_VERSION,
     OPENSTACK_KEYPAIR,
     OPENSTACK_METADATA_KEY,
-    OPENSTACK_METADATA_VALUE,
-    OPENSTACK_NETWORK,
-    OPENSTACK_CLOUD_INIT_FILE,
 )
 from providers.schema import BaseProviderService
 from providers.replica import Replica, ReplicaStatus
@@ -31,7 +26,7 @@ class ProviderService(BaseProviderService):
         super().__init__(external_address_management)
         self.connector = openstack.connect(cloud="envvars")
 
-    def list(self) -> List[Replica]:
+    def list(self, tag, network) -> List[Replica]:
 
         servers = []
 
@@ -51,7 +46,7 @@ class ProviderService(BaseProviderService):
             server = server_object.to_dict()
             if (
                 OPENSTACK_METADATA_KEY in server["metadata"] and
-                server["metadata"][OPENSTACK_METADATA_KEY] == OPENSTACK_METADATA_VALUE
+                server["metadata"][OPENSTACK_METADATA_KEY] == tag
             ):
                 # If a deletion order has been sent, do not count the virtual machine
                 if server["task_state"] == "deleting":
@@ -70,14 +65,14 @@ class ProviderService(BaseProviderService):
 
                 # If an active VM does not have any IP address yet, count it as creating
                 if (
-                    OPENSTACK_NETWORK not in server["addresses"] and
+                    network not in server["addresses"] and
                     server_status == ReplicaStatus.CREATED_UNKNOWN
                 ):
                     server_status = ReplicaStatus.CREATING
 
                 # Get the IP address of the virtual machine
-                elif OPENSTACK_NETWORK in server["addresses"]:
-                    for server_port in server["addresses"][OPENSTACK_NETWORK]:
+                elif network in server["addresses"]:
+                    for server_port in server["addresses"][network]:
                         if (
                             server_port["version"] == OPENSTACK_IP_VERSION
                             and server_port["OS-EXT-IPS:type"] == "fixed"
@@ -97,25 +92,15 @@ class ProviderService(BaseProviderService):
 
         return servers
 
-    def create(self, count: int = 1):
+    def create(self, server_configuration_base: Dict[str, Union[str, Dict [str, str]]],
+    count: int = 1 ):
 
         def creation_function():
-            server_configuration = {
-                "name": "server",
-                "image": OPENSTACK_IMAGE,
-                "flavor": OPENSTACK_FLAVOR,
-                "network": OPENSTACK_NETWORK,
-                "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_VALUE },
-            }
+            server_configuration = server_configuration_base
 
             # Add optional key pair
             if OPENSTACK_KEYPAIR:
                 server_configuration["key_name"] = OPENSTACK_KEYPAIR
-
-            # Add optional cloud-init
-            if OPENSTACK_CLOUD_INIT_FILE:
-                with open(OPENSTACK_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
-                    server_configuration["userdata"] = cloud_init_file.read()
 
             return self.connector.create_server(**server_configuration)
 

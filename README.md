@@ -54,7 +54,7 @@ The full documentation of the SimpleScaleVM Docker image is available on [Docker
 
 ## Tests
 
-In order to be able to test the autoscaling module, a simple HTTP webserver that listens on all GET requests and returns replica API responses can be launched with the following command:
+In order to be able to test the scaling module, a simple HTTP webserver that listens on all GET requests and returns replica API responses can be launched with the following command:
 
 ```bash
 make mock

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Configure the autoscaling module.
+Configure the scaling module.
 
 Variables:
     APP_HOST

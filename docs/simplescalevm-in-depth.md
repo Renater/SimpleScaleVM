@@ -40,3 +40,14 @@ In this situation:
 * replica #5 is still created so it adds a number of potential resources equal to `REPLICA CAPACITY` (`3` here).
 
 Thus, there are `0 + 1 + 3 = 4` resources potentially available. Yet, `REPLICA_MIN_AVAILABLE_RESOURCES` is set to `6` so the scaler should schedule the creations of `ceil[(6 - 4) / 3] = 1` replica.
+
+
+## External address management
+
+The module includes a feature that manages the assignment of external addresses to replicas. When this option is enabled, the scaler will manage to always assign a maximum number of external addresses from a specific pool to healthy replicas.
+
+This process is completed inside the scaling iterations of the scheduler. The general functioning of this feature is summarized in the following graphic:
+
+![external addresses](./external_addresses.png)
+
+The main application for this feature is **high availability**. With a single (or a few) external address(es) held by the provider, it can be used as a _Keepalived-like_ solution: every time a service that is attached to an external address encounters a problem, it can be replaced with a backup replica that gets back the external address.

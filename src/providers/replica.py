@@ -22,10 +22,18 @@ class Replica:
     """Replica representation."""
 
     identifier: str
-    address: Union[str, None]
     status: ReplicaStatus
+    address: Union[str, None]
+    external_address: Union[str, None]
 
-    def __init__(self, identifier: str, address: str, status: ReplicaStatus):
+    def __init__(
+        self,
+        identifier: str,
+        status: ReplicaStatus,
+        address: Union[str, None] = None,
+        external_address: Union[str, None] = None,
+    ):
         self.identifier = identifier
-        self.address = address
         self.status = status
+        self.address = address
+        self.external_address = external_address

@@ -42,15 +42,11 @@ class SchedulerService:
         self.replica_capacity = replica_configuration["capacity"]
         self.min_available_resources = replica_configuration["min_available_resources"]
 
-    def loop(self, isMaster: Callable[[None], bool] = lambda : True):
+    def loop(self, is_master: Callable[[None], bool] = lambda : True):
         """Check the status of all replicas, delete the replicas that should be deleted and
         create a number of replicas to always have the minimum number of available resources."""
 
-        print("Hello")
-
-        if isMaster():
-
-            print("World")
+        if is_master():
 
             replicas = self.provider.service.list(
                 tag=OPENSTACK_METADATA_SCALED_VALUE,
@@ -125,8 +121,10 @@ class SchedulerService:
 
                 # Add optional cloud-init
                 if OPENSTACK_SCALED_CLOUD_INIT_FILE:
-                    with open(OPENSTACK_SCALED_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
+                    with open(OPENSTACK_SCALED_CLOUD_INIT_FILE,
+                    encoding="utf-8") as cloud_init_file:
                         server_configuration["userdata"] = cloud_init_file.read()
 
-                print(f"Scaling up: {replicas_to_create} replicas has been scheduled for creation.")
+                print(f"Scaling up: {replicas_to_create} replicas"
+                    + "has been scheduled for creation.")
                 self.provider.service.create(server_configuration, replicas_to_create)

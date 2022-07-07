@@ -19,6 +19,7 @@ from providers.openstack.settings import (
     OPENSTACK_METADATA_AUTOSCALER_VALUE,
     OPENSTACK_AUTOSCALER_NETWORK,
     OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE,
+    OPENSTACK_AUTOSCALER_MIN_REPLICA,
 )
 
 
@@ -43,7 +44,7 @@ class AutoScalerService:
             "termination_key": "isMaster"
         })
         self.replica_capacity = 1
-        self.min_available_resources = 3
+        self.min_available_resources = OPENSTACK_AUTOSCALER_MIN_REPLICA
         self.master = False
         self.address = get('https://api.ipify.org').text
 

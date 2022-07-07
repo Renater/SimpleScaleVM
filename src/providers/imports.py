@@ -22,7 +22,7 @@ def import_provider(provider_name: str) -> ModuleType:
         provider_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(provider_module)
     except ModuleNotFoundError as error:
-        print (f"Provider '{provider_name}' could not be imported: {error}")
+        print(f"Provider '{provider_name}' could not be imported: {error}")
         sys.exit()
 
     return provider_module

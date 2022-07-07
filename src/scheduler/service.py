@@ -7,7 +7,7 @@ Classes:
 """
 
 import math
-from typing import Dict, Union
+from typing import Callable, Dict, Union
 from scheduler.api import APIService
 from providers.main import Provider
 from providers.replica import ReplicaStatus
@@ -42,85 +42,91 @@ class SchedulerService:
         self.replica_capacity = replica_configuration["capacity"]
         self.min_available_resources = replica_configuration["min_available_resources"]
 
-    def loop(self):
+    def loop(self, isMaster: Callable[[None], bool] = lambda : True):
         """Check the status of all replicas, delete the replicas that should be deleted and
         create a number of replicas to always have the minimum number of available resources."""
 
-        replicas = self.provider.service.list(
-            tag=OPENSTACK_METADATA_SCALED_VALUE,
-            network=OPENSTACK_SCALED_NETWORK
-        )
-        healthy_replicas = []
-        replicas_to_delete = []
-        available_resources = 0
+        print("Hello")
 
-        for replica in replicas:
-            # If the replica is in error state, add it to the deletion list
-            if replica.status == ReplicaStatus.ERROR:
-                replicas_to_delete.append((replica, "error"))
-                continue
+        if isMaster():
 
-            # If the replica is creating, add the potential resources to the count
-            if replica.status == ReplicaStatus.CREATING:
-                available_resources += self.replica_capacity
-                continue
+            print("World")
 
-            # Check the status of the replica
-            status = self.api.get_status(replica)
-            if status:
-                if status["termination"]:
-                    replicas_to_delete.append((replica, "termination"))
-                else:
-                    healthy_replicas.append(replica)
-                    available_resources += status["capacity"]
-
-        # Find all replicas without external address
-        available_replicas = [
-            replica for replica in healthy_replicas if not replica.external_address
-        ]
-
-        for replica, reason in replicas_to_delete:
-            print(
-                f"Scaling down ({reason}): replica with ID "
-                + f"{replica.identifier} has been scheduled for deletion."
+            replicas = self.provider.service.list(
+                tag=OPENSTACK_METADATA_SCALED_VALUE,
+                network=OPENSTACK_SCALED_NETWORK
             )
+            healthy_replicas = []
+            replicas_to_delete = []
+            available_resources = 0
 
-            migration_replica = None
-            # If replica has an external address, reassign it
-            if replica.external_address and len(available_replicas) > 0:
-                migration_replica = available_replicas.pop()
-                print(
-                    f"Address {replica.external_address} reassigned from replica with ID "
-                    + f"{replica.identifier} to replica with ID {migration_replica.identifier}."
+            for replica in replicas:
+                # If the replica is in error state, add it to the deletion list
+                if replica.status == ReplicaStatus.ERROR:
+                    replicas_to_delete.append((replica, "error"))
+                    continue
+
+                # If the replica is creating, add the potential resources to the count
+                if replica.status == ReplicaStatus.CREATING:
+                    available_resources += self.replica_capacity
+                    continue
+
+                # Check the status of the replica
+                status = self.api.get_status(replica)
+                if status:
+                    if status["termination"]:
+                        replicas_to_delete.append((replica, "termination"))
+                    else:
+                        healthy_replicas.append(replica)
+                        available_resources += status["capacity"]
+
+            # Find all replicas without external address
+            available_replicas = [
+                replica for replica in healthy_replicas if not replica.external_address
+            ]
+
+            for replica, reason in replicas_to_delete:
+                print((
+                    f"Scaling down ({reason}): replica with ID "
+                    + f"{replica.identifier} has been scheduled for deletion."
+                ))
+
+                migration_replica = None
+                # If replica has an external address, reassign it
+                if replica.external_address and len(available_replicas) > 0:
+                    migration_replica = available_replicas.pop()
+                    print((
+                        f"Address {replica.external_address} reassigned from replica with ID "
+                        + f"{replica.identifier} to replica with ID {migration_replica.identifier}."
+                    ))
+
+                self.provider.service.delete(replica, migration_replica)
+
+            # Assign the available external addresses
+            external_address_assignment = self.provider.service.assign(available_replicas)
+            for external_address in external_address_assignment:
+                print((
+                    f"Address {external_address} has been assigned to replica with ID "
+                    + f"{external_address_assignment[external_address].identifier}."
+                ))
+
+            # If there are not enough available resources, create replicas
+            if available_resources < self.min_available_resources:
+                replicas_to_create = math.ceil(
+                    (self.min_available_resources - available_resources) / self.replica_capacity
                 )
+                server_configuration = {
+                    "name": OPENSTACK_SCALED_NAME,
+                    "image": OPENSTACK_SCALED_IMAGE,
+                    "flavor": OPENSTACK_SCALED_FLAVOR,
+                    "network": OPENSTACK_SCALED_NETWORK,
+                    "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_SCALED_VALUE },
+                }
 
-            self.provider.service.delete(replica, migration_replica)
+                # Add optional cloud-init
+                if OPENSTACK_SCALED_CLOUD_INIT_FILE:
+                    with open(OPENSTACK_SCALED_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
+                        server_configuration["userdata"] = cloud_init_file.read()
 
-        # Assign the available external addresses
-        external_address_assignment = self.provider.service.assign(available_replicas)
-        for external_address in external_address_assignment:
-            print(
-                f"Address {external_address} has been assigned to replica with ID "
-                + f"{external_address_assignment[external_address].identifier}."
-            )
-
-        # If there are not enough available resources, create replicas
-        if available_resources < self.min_available_resources:
-            replicas_to_create = math.ceil(
-                (self.min_available_resources - available_resources) / self.replica_capacity
-            )
-            server_configuration = {
-                "name": OPENSTACK_SCALED_NAME,
-                "image": OPENSTACK_SCALED_IMAGE,
-                "flavor": OPENSTACK_SCALED_FLAVOR,
-                "network": OPENSTACK_SCALED_NETWORK,
-                "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_SCALED_VALUE },
-            }
-
-            # Add optional cloud-init
-            if OPENSTACK_SCALED_CLOUD_INIT_FILE:
-                with open(OPENSTACK_SCALED_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
-                    server_configuration["userdata"] = cloud_init_file.read()
-
-            print(f"Scaling up: {replicas_to_create} replicas has been scheduled for creation.")
-            self.provider.service.create(server_configuration, replicas_to_create)
+                print(f"Scaling up: {replicas_to_create} replicas has been scheduled for creation.")
+                self.provider.service.create(server_configuration, replicas_to_create)

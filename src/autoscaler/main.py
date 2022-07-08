@@ -132,5 +132,5 @@ class AutoScalerService:
                     with open(OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
                         server_configuration["userdata"] = cloud_init_file.read()
 
-                print(f"Scaling up: {replicas_to_create} replicas has been scheduled for creation.")
+                print(f"Auto-scaling up: {replicas_to_create} replicas have been scheduled for creation.")
                 self.provider.service.create(server_configuration, replicas_to_create)

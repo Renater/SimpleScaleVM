@@ -70,19 +70,19 @@ class SchedulerService:
             ]
 
             for replica, reason in replicas_to_delete:
-                print((
+                print(
                     f"Scaling down ({reason}): replica with ID "
                     + f"{replica.identifier} has been scheduled for deletion."
-                ))
+                )
 
                 migration_replica = None
                 # If replica has an external address, reassign it
                 if replica.external_address and len(available_replicas) > 0:
                     migration_replica = available_replicas.pop()
-                    print((
+                    print(
                         f"Address {replica.external_address} reassigned from replica with ID "
                         + f"{replica.identifier} to replica with ID {migration_replica.identifier}."
-                    ))
+                    )
 
                 self.provider.service.delete(replica, migration_replica)
 
@@ -100,6 +100,6 @@ class SchedulerService:
                     (self.min_available_resources - available_resources) / self.replica_capacity
                 )
 
-                print(f"Scaling up: {replicas_to_create} replicas"
+                print(f"Scaling up: {replicas_to_create} replicas "
                     + "has been scheduled for creation.")
                 self.provider.service.create(replicas_to_create)

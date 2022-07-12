@@ -10,7 +10,7 @@ from typing import Dict, Union
 from apscheduler.schedulers.background import BackgroundScheduler
 from providers.main import Provider
 from scheduler.service import SchedulerService
-from autoscaler.settings import ENABLE_AUTOSCALING
+from settings import ENABLE_AUTOSCALING
 from autoscaler.main import AutoScalerService
 
 

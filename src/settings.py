@@ -27,6 +27,7 @@ dotenv.load_dotenv()
 APP_HOST = os.getenv("APP_HOST", "0.0.0.0")
 APP_PORT = int(os.getenv("APP_PORT", "8000"))
 EXTERNAL_ADDRESS_MANAGEMENT = os.getenv("EXTERNAL_ADDRESS_MANAGEMENT", "false") != "false"
+ENABLE_AUTOSCALING = os.getenv("ENABLE_AUTOSCALING", "false") != "false"
 PROVIDER = os.getenv("PROVIDER", "openstack")
 REPLICA_CAPACITY = int(os.getenv("REPLICA_CAPACITY", "1"))
 REPLICA_MIN_AVAILABLE_RESOURCES = int(os.getenv("REPLICA_MIN_AVAILABLE_RESOURCES", "3"))

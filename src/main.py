@@ -19,7 +19,7 @@ from settings import (
     REPLICA_API_TERMINATION_KEY,
 )
 from providers.main import Provider
-from autoscaler.settings import ENABLE_AUTOSCALING
+from settings import ENABLE_AUTOSCALING
 
 
 if __name__ == "__main__":

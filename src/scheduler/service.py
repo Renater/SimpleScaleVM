@@ -11,15 +11,6 @@ from typing import Callable, Dict, Union
 from scheduler.api import APIService
 from providers.main import Provider
 from providers.replica import ReplicaStatus
-from providers.openstack.settings import (
-    OPENSTACK_SCALED_NAME,
-    OPENSTACK_SCALED_FLAVOR,
-    OPENSTACK_SCALED_IMAGE,
-    OPENSTACK_METADATA_KEY,
-    OPENSTACK_METADATA_SCALED_VALUE,
-    OPENSTACK_SCALED_NETWORK,
-    OPENSTACK_SCALED_CLOUD_INIT_FILE,
-)
 
 class SchedulerService:
     """Scheduler service of the scaling module."""
@@ -48,10 +39,7 @@ class SchedulerService:
 
         if is_master():
 
-            replicas = self.provider.service.list(
-                tag=OPENSTACK_METADATA_SCALED_VALUE,
-                network=OPENSTACK_SCALED_NETWORK
-            )
+            replicas = self.provider.service.list()
             healthy_replicas = []
             replicas_to_delete = []
             available_resources = 0
@@ -111,20 +99,7 @@ class SchedulerService:
                 replicas_to_create = math.ceil(
                     (self.min_available_resources - available_resources) / self.replica_capacity
                 )
-                server_configuration = {
-                    "name": OPENSTACK_SCALED_NAME,
-                    "image": OPENSTACK_SCALED_IMAGE,
-                    "flavor": OPENSTACK_SCALED_FLAVOR,
-                    "network": OPENSTACK_SCALED_NETWORK,
-                    "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_SCALED_VALUE },
-                }
-
-                # Add optional cloud-init
-                if OPENSTACK_SCALED_CLOUD_INIT_FILE:
-                    with open(OPENSTACK_SCALED_CLOUD_INIT_FILE,
-                    encoding="utf-8") as cloud_init_file:
-                        server_configuration["userdata"] = cloud_init_file.read()
 
                 print(f"Scaling up: {replicas_to_create} replicas"
                     + "has been scheduled for creation.")
-                self.provider.service.create(server_configuration, replicas_to_create)
+                self.provider.service.create(replicas_to_create)

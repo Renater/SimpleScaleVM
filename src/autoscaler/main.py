@@ -11,16 +11,7 @@ from providers.main import Provider
 from scheduler.api import APIService
 from providers.replica import ReplicaStatus
 from requests import get
-from providers.openstack.settings import (
-    OPENSTACK_AUTOSCALER_NAME,
-    OPENSTACK_AUTOSCALER_FLAVOR,
-    OPENSTACK_AUTOSCALER_IMAGE,
-    OPENSTACK_METADATA_KEY,
-    OPENSTACK_METADATA_AUTOSCALER_VALUE,
-    OPENSTACK_AUTOSCALER_NETWORK,
-    OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE,
-    OPENSTACK_AUTOSCALER_MIN_REPLICA,
-)
+from autoscaler.settings import AUTOSCALING_MIN_REPLICA
 
 
 class AutoScalerService:
@@ -44,7 +35,7 @@ class AutoScalerService:
             "termination_key": "isMaster"
         })
         self.replica_capacity = 1
-        self.min_available_resources = OPENSTACK_AUTOSCALER_MIN_REPLICA
+        self.min_available_resources = AUTOSCALING_MIN_REPLICA
         self.master = False
         self.address = get('https://api.ipify.org').text
 
@@ -55,7 +46,7 @@ class AutoScalerService:
         """Check the status of all replicas, delete the replicas that should be deleted and
         create a number of replicas to always have the minimum number of available resources."""
 
-        replicas = self.provider.service.list(tag=OPENSTACK_METADATA_AUTOSCALER_VALUE, network=OPENSTACK_AUTOSCALER_NETWORK)
+        replicas = self.provider.service.list(autoscaling=True)
         available_resources = 0
 
         if not self.master:
@@ -119,18 +110,5 @@ class AutoScalerService:
                     (self.min_available_resources - available_resources) / self.replica_capacity
                 )
 
-                server_configuration = {
-                    "name": OPENSTACK_AUTOSCALER_NAME,
-                    "image": OPENSTACK_AUTOSCALER_IMAGE,
-                    "flavor": OPENSTACK_AUTOSCALER_FLAVOR,
-                    "network": OPENSTACK_AUTOSCALER_NETWORK,
-                    "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_AUTOSCALER_VALUE },
-                }
-
-                # Add optional cloud-init
-                if OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE:
-                    with open(OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
-                        server_configuration["userdata"] = cloud_init_file.read()
-
                 print(f"Auto-scaling up: {replicas_to_create} replicas have been scheduled for creation.")
-                self.provider.service.create(server_configuration, replicas_to_create)
+                self.provider.service.create(replicas_to_create, autoscaling=True)

@@ -6,6 +6,7 @@ Classes:
     ProviderService
 """
 
+from enum import auto
 from typing import Dict, List, Union
 from threading import Thread
 import openstack
@@ -17,6 +18,7 @@ from providers.openstack.settings import (
 )
 from providers.schema import BaseProviderService
 from providers.replica import Replica, ReplicaStatus
+from providers.openstack.settings import OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE, OPENSTACK_AUTOSCALER_FLAVOR, OPENSTACK_AUTOSCALER_IMAGE, OPENSTACK_AUTOSCALER_NAME, OPENSTACK_AUTOSCALER_NETWORK, OPENSTACK_METADATA_AUTOSCALER_VALUE, OPENSTACK_METADATA_SCALED_VALUE, OPENSTACK_SCALED_CLOUD_INIT_FILE, OPENSTACK_SCALED_FLAVOR, OPENSTACK_SCALED_IMAGE, OPENSTACK_SCALED_NAME, OPENSTACK_SCALED_NETWORK
 
 
 class ProviderService(BaseProviderService):
@@ -26,7 +28,14 @@ class ProviderService(BaseProviderService):
         super().__init__(external_address_management)
         self.connector = openstack.connect(cloud="envvars")
 
-    def list(self, tag, network) -> List[Replica]:
+    def list(self, autoscaling: bool = False) -> List[Replica]:
+
+        if autoscaling:
+            metadata_value = OPENSTACK_METADATA_AUTOSCALER_VALUE
+            network = OPENSTACK_AUTOSCALER_NETWORK
+        else:
+            metadata_value = OPENSTACK_METADATA_SCALED_VALUE
+            network = OPENSTACK_SCALED_NETWORK
 
         servers = []
 
@@ -46,7 +55,7 @@ class ProviderService(BaseProviderService):
             server = server_object.to_dict()
             if (
                 OPENSTACK_METADATA_KEY in server["metadata"] and
-                server["metadata"][OPENSTACK_METADATA_KEY] == tag
+                server["metadata"][OPENSTACK_METADATA_KEY] == metadata_value
             ):
                 # If a deletion order has been sent, do not count the virtual machine
                 if server["task_state"] == "deleting":
@@ -92,11 +101,34 @@ class ProviderService(BaseProviderService):
 
         return servers
 
-    def create(self, server_configuration_base: Dict[str, Union[str, Dict [str, str]]],
-    count: int = 1 ):
+    def create(self, count: int = 1, autoscaling: bool = False):
 
         def creation_function():
-            server_configuration = server_configuration_base
+
+            if autoscaling:
+                server_configuration = {
+                    "name": OPENSTACK_AUTOSCALER_NAME,
+                    "image": OPENSTACK_AUTOSCALER_IMAGE,
+                    "flavor": OPENSTACK_AUTOSCALER_FLAVOR,
+                    "network": OPENSTACK_AUTOSCALER_NETWORK,
+                    "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_AUTOSCALER_VALUE },
+                }
+                # Add optional cloud-init
+                if OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE:
+                    with open(OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
+                        server_configuration["userdata"] = cloud_init_file.read()
+            else:
+                server_configuration = {
+                    "name": OPENSTACK_SCALED_NAME,
+                    "image": OPENSTACK_SCALED_IMAGE,
+                    "flavor": OPENSTACK_SCALED_FLAVOR,
+                    "network": OPENSTACK_SCALED_NETWORK,
+                    "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_SCALED_VALUE },
+                }
+                # Add optional cloud-init
+                if OPENSTACK_SCALED_CLOUD_INIT_FILE:
+                    with open(OPENSTACK_SCALED_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
+                        server_configuration["userdata"] = cloud_init_file.read()
 
             # Add optional key pair
             if OPENSTACK_KEYPAIR:

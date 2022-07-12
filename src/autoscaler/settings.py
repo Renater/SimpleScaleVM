@@ -11,4 +11,4 @@ import os
 
 # Create Openstack environment parameters
 
-ENABLE_AUTOSCALING = os.getenv("ENABLE_AUTOSCALING", "false") == "true"
+AUTOSCALING_MIN_REPLICA = int(os.getenv("AUTOSCALING_MIN_REPLICA", "2"))

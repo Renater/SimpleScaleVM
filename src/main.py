@@ -17,9 +17,9 @@ from settings import (
     REPLICA_API_PATH,
     REPLICA_API_CAPACITY_KEY,
     REPLICA_API_TERMINATION_KEY,
+    ENABLE_AUTOSCALING,
 )
 from providers.main import Provider
-from settings import ENABLE_AUTOSCALING
 
 
 if __name__ == "__main__":

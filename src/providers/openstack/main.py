@@ -6,7 +6,6 @@ Classes:
     ProviderService
 """
 
-from enum import auto
 from typing import Dict, List, Union
 from threading import Thread
 import openstack
@@ -15,10 +14,21 @@ from providers.openstack.settings import (
     OPENSTACK_IP_VERSION,
     OPENSTACK_KEYPAIR,
     OPENSTACK_METADATA_KEY,
+    OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE,
+    OPENSTACK_AUTOSCALER_FLAVOR,
+    OPENSTACK_AUTOSCALER_IMAGE,
+    OPENSTACK_AUTOSCALER_NAME,
+    OPENSTACK_AUTOSCALER_NETWORK,
+    OPENSTACK_METADATA_AUTOSCALER_VALUE,
+    OPENSTACK_SCALED_CLOUD_INIT_FILE,
+    OPENSTACK_SCALED_FLAVOR,
+    OPENSTACK_SCALED_IMAGE,
+    OPENSTACK_SCALED_NAME,
+    OPENSTACK_SCALED_NETWORK,
+    OPENSTACK_METADATA_SCALED_VALUE,
 )
 from providers.schema import BaseProviderService
 from providers.replica import Replica, ReplicaStatus
-from providers.openstack.settings import OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE, OPENSTACK_AUTOSCALER_FLAVOR, OPENSTACK_AUTOSCALER_IMAGE, OPENSTACK_AUTOSCALER_NAME, OPENSTACK_AUTOSCALER_NETWORK, OPENSTACK_METADATA_AUTOSCALER_VALUE, OPENSTACK_METADATA_SCALED_VALUE, OPENSTACK_SCALED_CLOUD_INIT_FILE, OPENSTACK_SCALED_FLAVOR, OPENSTACK_SCALED_IMAGE, OPENSTACK_SCALED_NAME, OPENSTACK_SCALED_NETWORK
 
 
 class ProviderService(BaseProviderService):
@@ -30,6 +40,22 @@ class ProviderService(BaseProviderService):
 
     def list(self, autoscaling: bool = False) -> List[Replica]:
 
+        def get_external_addresses():
+            # Search for external addresses if `EXTERNAL_ADDRESS_MANAGEMENT` is enabled
+            external_addresses = {}
+            if self.external_address_management:
+                for floating_ip_object in self.connector.list_floating_ips():
+                    if (
+                        floating_ip_object.description == OPENSTACK_FLOATING_IP_DESCRIPTION
+                        and floating_ip_object.attached
+                    ):
+                        external_addresses[
+                            floating_ip_object.fixed_ip_address
+                        ] = floating_ip_object.floating_ip_address
+
+            return external_addresses
+
+
         if autoscaling:
             metadata_value = OPENSTACK_METADATA_AUTOSCALER_VALUE
             network = OPENSTACK_AUTOSCALER_NETWORK
@@ -38,18 +64,7 @@ class ProviderService(BaseProviderService):
             network = OPENSTACK_SCALED_NETWORK
 
         servers = []
-
-        # Search for external addresses if `EXTERNAL_ADDRESS_MANAGEMENT` is enabled
-        external_addresses = {}
-        if self.external_address_management:
-            for floating_ip_object in self.connector.list_floating_ips():
-                if (
-                    floating_ip_object.description == OPENSTACK_FLOATING_IP_DESCRIPTION
-                    and floating_ip_object.attached
-                ):
-                    external_addresses[
-                        floating_ip_object.fixed_ip_address
-                    ] = floating_ip_object.floating_ip_address
+        external_addresses = get_external_addresses()
 
         for server_object in self.connector.compute.servers():
             server = server_object.to_dict()
@@ -115,8 +130,8 @@ class ProviderService(BaseProviderService):
                 }
                 # Add optional cloud-init
                 if OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE:
-                    with open(OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
-                        server_configuration["userdata"] = cloud_init_file.read()
+                    with open(OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE, encoding="utf-8") as file:
+                        server_configuration["userdata"] = file.read()
             else:
                 server_configuration = {
                     "name": OPENSTACK_SCALED_NAME,
@@ -127,8 +142,8 @@ class ProviderService(BaseProviderService):
                 }
                 # Add optional cloud-init
                 if OPENSTACK_SCALED_CLOUD_INIT_FILE:
-                    with open(OPENSTACK_SCALED_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
-                        server_configuration["userdata"] = cloud_init_file.read()
+                    with open(OPENSTACK_SCALED_CLOUD_INIT_FILE, encoding="utf-8") as file:
+                        server_configuration["userdata"] = file.read()
 
             # Add optional key pair
             if OPENSTACK_KEYPAIR:

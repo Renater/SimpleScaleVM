@@ -72,7 +72,7 @@ class AutoScalerService:
 
             for replica in replicas:
 
-                # If the replica is in error state, add it to the deletion list
+                # If the replica is in error state, send the deletion order
                 if replica.status == ReplicaStatus.ERROR:
                     print((
                         f"Auto-scaling down: replica with ID "

@@ -8,7 +8,7 @@ Classes:
 
 from http.server import BaseHTTPRequestHandler
 import json
-from typing import Callable
+from typing import Callable, Tuple
 from socketserver import BaseServer
 
 
@@ -17,8 +17,13 @@ class ServerRequestHandler(BaseHTTPRequestHandler):
 
     status_function: Callable[[None], bool]
 
-    def __init__(self, status_function: Callable[[None], bool],
-    request: bytes, client_address: tuple[str, int], server: BaseServer) -> None:
+    def __init__(
+        self,
+        status_function: Callable[[None], bool],
+        request: bytes, client_address: Tuple[str, int],
+        server: BaseServer,
+    ):
+
         self.status_function = status_function
         super().__init__(request, client_address, server)
 

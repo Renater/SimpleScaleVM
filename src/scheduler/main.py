@@ -21,8 +21,13 @@ class Scheduler():
     service: SchedulerService
     autoscaler: Union[AutoScalerService, None]
 
-    def __init__(self, provider: Provider, port: int,
-    replica_configuration: Dict[str, Union[str, int]]):
+    def __init__(
+        self,
+        provider: Provider,
+        port: int,
+        replica_configuration: Dict[str, Union[str, int]],
+    ):
+
         self.service = SchedulerService(provider, replica_configuration)
         self.job_queue = BackgroundScheduler()
         self.autoscaler = None

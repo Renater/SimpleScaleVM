@@ -10,8 +10,7 @@ import math
 from providers.main import Provider
 from scheduler.api import APIService
 from providers.replica import ReplicaStatus
-from requests import get
-from autoscaler.settings import AUTOSCALING_MIN_REPLICA
+from autoscaler.settings import AUTOSCALING_MIN_REPLICA, AUTOSCALING_HOST_IP_ADDRESS
 
 
 class AutoScalerService:
@@ -37,7 +36,7 @@ class AutoScalerService:
         self.replica_capacity = 1
         self.min_available_resources = AUTOSCALING_MIN_REPLICA
         self.master = False
-        self.address = get('https://api.ipify.org').text
+        self.address = AUTOSCALING_HOST_IP_ADDRESS
 
     def getMaster(self):
         return self.master

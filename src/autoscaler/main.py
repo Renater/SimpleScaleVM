@@ -50,10 +50,7 @@ class AutoScalerService:
         available_resources = 0
 
         if not self.master:
-            master_exists = False
-
-            # If there are no masters in the cluster, the lowest IP address takes this role
-            lowest_ip = self.address
+            is_master_candidate = True
 
             for replica in replicas:
 
@@ -61,12 +58,13 @@ class AutoScalerService:
                     status = self.api.get_status(replica)
                     if status:
                         if replica.address < self.address:
-                            lowest_ip = replica.address
+                            is_master_candidate = False
+                            break
                         if status["termination"]:
-                            master_exists = True
+                            is_master_candidate = False
                             break
 
-            if not master_exists and lowest_ip == self.address:
+            if not is_master_candidate: # If there is no master in the cluster, the lowest IP address takes this role
                 self.master = True
                 print("Became master")
 

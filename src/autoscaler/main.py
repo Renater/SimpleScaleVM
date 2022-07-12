@@ -63,7 +63,7 @@ class AutoScalerService:
                             is_master_candidate = False
                             break
 
-            if not is_master_candidate: # If there is no master in the cluster, the lowest IP address takes this role
+            if is_master_candidate: # If there is no master in the cluster, the lowest IP address takes this role
                 self.master = True
                 print("Became master")
 

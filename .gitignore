@@ -1,5 +1,6 @@
 .env
 cloud-init.sh
+scaler.cloud-init.sh
 env/
 tests/mock.env
 __pycache__/

@@ -36,7 +36,7 @@ class Scheduler():
             self.autoscaler = AutoScalerService(provider, port)
             self.job_queue.add_job(self.autoscaler.loop, "interval", minutes=1)
             self.job_queue.add_job(
-                lambda : self.service.loop(self.autoscaler.getMaster),
+                lambda : self.service.loop(self.autoscaler.get_master),
                 "interval",
                 minutes=1
             )

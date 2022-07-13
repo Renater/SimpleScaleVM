@@ -35,7 +35,7 @@ if __name__ == "__main__":
     })
 
     if ENABLE_AUTOSCALING:
-        server = ServerLauncher(APP_HOST, APP_PORT, scheduler.autoscaler.getMaster)
+        server = ServerLauncher(APP_HOST, APP_PORT, scheduler.autoscaler.get_master)
     else:
         server = ServerLauncher(APP_HOST, APP_PORT, lambda : True)
 

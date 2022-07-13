@@ -10,7 +10,7 @@ import math
 from providers.main import Provider
 from scheduler.api import APIService
 from providers.replica import ReplicaStatus
-from autoscaler.settings import AUTOSCALING_MIN_REPLICA, AUTOSCALING_HOST_IP_ADDRESS
+from settings import AUTOSCALING_MIN_REPLICA, AUTOSCALING_HOST_IP_ADDRESS
 
 
 class AutoScalerService:
@@ -38,7 +38,7 @@ class AutoScalerService:
         self.master = False
         self.address = AUTOSCALING_HOST_IP_ADDRESS
 
-    def getMaster(self):
+    def get_master(self):
         return self.master
 
     def loop(self):

@@ -10,7 +10,6 @@ import math
 from providers.main import Provider
 from scheduler.api import APIService
 from providers.replica import ReplicaStatus
-from settings import AUTOSCALING_MIN_REPLICA, AUTOSCALING_HOST_IP_ADDRESS
 
 
 class AutoScalerService:
@@ -24,7 +23,7 @@ class AutoScalerService:
     address: str
 
 
-    def __init__(self, provider: Provider, port: int):
+    def __init__(self, provider: Provider, port: int, min_replica: int, host_address: str):
         self.provider = provider
         self.api = APIService({
             "protocol": "http",
@@ -34,9 +33,9 @@ class AutoScalerService:
             "termination_key": "isMaster"
         })
         self.replica_capacity = 1
-        self.min_available_resources = AUTOSCALING_MIN_REPLICA
+        self.min_available_resources = min_replica
         self.master = False
-        self.address = AUTOSCALING_HOST_IP_ADDRESS
+        self.address = host_address
 
     def get_master(self):
         return self.master

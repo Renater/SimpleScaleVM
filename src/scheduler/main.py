@@ -10,7 +10,6 @@ from typing import Dict, Union
 from apscheduler.schedulers.background import BackgroundScheduler
 from providers.main import Provider
 from scheduler.service import SchedulerService
-from settings import ENABLE_AUTOSCALING
 from autoscaler.main import AutoScalerService
 
 
@@ -26,14 +25,20 @@ class Scheduler():
         provider: Provider,
         port: int,
         replica_configuration: Dict[str, Union[str, int]],
+        autoscaling_configuration: Dict[str, Union[str, int]],
     ):
 
         self.service = SchedulerService(provider, replica_configuration)
         self.job_queue = BackgroundScheduler()
         self.autoscaler = None
 
-        if ENABLE_AUTOSCALING:
-            self.autoscaler = AutoScalerService(provider, port)
+        if autoscaling_configuration["enabled"]:
+            self.autoscaler = AutoScalerService(
+                provider,
+                port,
+                autoscaling_configuration["min_available_resources"],
+                autoscaling_configuration["address"],
+            )
             self.job_queue.add_job(self.autoscaler.loop, "interval", minutes=1)
             self.job_queue.add_job(
                 lambda : self.service.loop(self.autoscaler.get_master),

@@ -222,29 +222,33 @@ Openstack interface. Default value is `public`.
 
 Version of the Openstack API. Default value is `3`.
 
-### OPENSTACK_FLAVOR ###
+### OPENSTACK_SCALED_NAME ###
 
-Name of the flavor to use for the virtual machines. Default value is `d2-8`.
+Name of the scaled virtual machines. Default value is `server`.
 
-### OPENSTACK_IMAGE ###
+### OPENSTACK_SCALED_FLAVOR ###
 
-Name of the image to use for the virtual machines. Default value is `Debian 11`.
+Name of the flavor to use for the scaled virtual machines. Default value is `d2-8`.
+
+### OPENSTACK_SCALED_IMAGE ###
+
+Name of the image to use for the scaled virtual machines. Default value is `Debian 11`.
 
 ### OPENSTACK_IP_VERSION ###
 
 IP version to use for virtual machines. Default value is `4`.
 
-### OPENSTACK_NETWORK ###
+### OPENSTACK_SCALED_NETWORK ###
 
-Name of the network to use for the virtual machines. Default value is `Ext-Net`.
+Name of the network to use for the scaled virtual machines. Default value is `Ext-Net`.
 
 ### OPENSTACK_METADATA_KEY ###
 
 Metadata key to identify the scaled server pool. Default value is `group`.
 
-### OPENSTACK_METADATA_VALUE ###
+### OPENSTACK_METADATA_SCALED_VALUE ###
 
-Metadata value to identify the scaled server pool. Default value is `scaler`.
+Metadata value to identify the scaled server pool. Default value is `scaled`.
 
 ### OPENSTACK_FLOATING_IP_DESCRIPTION ###
 
@@ -254,6 +258,30 @@ Description of the floating IPs that should be assigned (only used when `EXTERNA
 
 Name of the keypair that is provisioned on the virtual machines. Optional.
 
-### OPENSTACK_CLOUD_INIT_FILE ###
+### OPENSTACK_SCALED_CLOUD_INIT_FILE ###
 
-Path to a cloud-init file to launch on virtual machines at creation. Optional.
+Path to a cloud-init file to launch on the scaled virtual machines at creation. Optional.
+
+### OPENSTACK_AUTOSCALER_NAME ###
+
+Name of the autoscaler virtual machines. Default value is `autoscaler`.
+
+### OPENSTACK_AUTOSCALER_FLAVOR ###
+
+Name of the flavor to use for the autoscaler virtual machines. Default value is `s1-2`.
+
+### OPENSTACK_AUTOSCALER_IMAGE ###
+
+Name of the image to use for the AUTOSCALER virtual machines. Default value is `Debian 11`.
+
+### OPENSTACK_AUTOSCALER_NETWORK ###
+
+Name of the network to use for the autoscaler virtual machines. Default value is `internal`.
+
+### OPENSTACK_METADATA_AUTOSCALER_VALUE ###
+
+Metadata value to identify the autoscaler server pool. Default value is `autoscaler`.
+
+### OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE ###
+
+Path to a cloud-init file to launch on the autoscaler virtual machines at creation. Optional.

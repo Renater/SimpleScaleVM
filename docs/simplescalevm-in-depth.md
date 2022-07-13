@@ -51,3 +51,18 @@ This process is completed inside the scaling iterations of the scheduler. The ge
 ![external addresses](./external_addresses.png)
 
 The main application for this feature is **high availability**. With a single (or a few) external address(es) held by the provider, it can be used as a _Keepalived-like_ solution: every time a service that is attached to an external address encounters a problem, it can be replaced with a backup replica that gets back the external address.
+
+
+## Autoscaling
+
+In order to provide high availability for the Scaler, the module includes a feature that allows to create an auto-managed cluster of SimpleScaleVM instances. The entire process is run inside a secondary job that is planned next to the main job on every instance. It relies on a master/slave paradigm:
+* one of the instances is the `master` and manages the creation and deletion of Scaler instances in the cluster.
+* all the other instances are `slaves` and verify that there is a healthy master in the cluster.
+
+The general functioning of the feature is summarized in the following graphic:
+
+![autoscaling infrastructure](./autoscaling_infrastructure.png)
+
+The mechanism that is used to elect a new master relies on lexicographical order: when a master goes down, each scaler checks if its internal address is the lowest among all healthy replicas to determine if it should become master. The following example illustrates this process:
+
+![autoscaling master](./autoscaling_master.png)

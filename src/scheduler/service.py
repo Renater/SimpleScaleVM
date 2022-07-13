@@ -89,10 +89,10 @@ class SchedulerService:
             # Assign the available external addresses
             external_address_assignment = self.provider.service.assign(available_replicas)
             for external_address in external_address_assignment:
-                print((
+                print(
                     f"Address {external_address} has been assigned to replica with ID "
                     + f"{external_address_assignment[external_address].identifier}."
-                ))
+                )
 
             # If there are not enough available resources, create replicas
             if available_resources < self.min_available_resources:

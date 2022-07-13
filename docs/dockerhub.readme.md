@@ -17,7 +17,9 @@
 
 # Supported tags
 
--   `openstack-2.0.0`, `openstack-2.0`, `openstack-2`, `openstack-latest`
+-   `openstack-3.0.0`, `openstack-3.0`, `openstack-3`, `openstack-latest`
+
+-   `openstack-2.0.0`, `openstack-2.0`, `openstack-2`
 
 -   `openstack-1.1.2`, `openstack-1.1`, `openstack-1`
 
@@ -159,6 +161,18 @@ Key of the API response that corresponds to the boolean indicating if the replic
 ### EXTERNAL_ADDRESS_MANAGEMENT ###
 
 Boolean that indicates if the scaler should manage external addresses. Default value is `false`.
+
+### ENABLE_AUTOSCALING ###
+
+Boolean that indicates if the scaler should auto-scale itself. Default value is `false`.
+
+### AUTOSCALING_MIN_REPLICA ###
+
+Minimum number of auto-scaler instances that should be up at all times. Default value is `3`.
+
+### AUTOSCALING_HOST_IP_ADDRESS ###
+
+IP address of the host, only used when `ENABLE_AUTOSCALING` is enabled. Default value is `0.0.0.0`.
 
 ### PROVIDER ###
 

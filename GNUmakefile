@@ -14,6 +14,9 @@ build:
 cloud-init.sh:
 	cp cloud-init.sh.example cloud-init.sh
 
+scaler.cloud-init.sh:
+	cp cloud-init.sh.example scaler.cloud-init.sh
+
 env:
 	virtualenv env
 
@@ -46,7 +49,7 @@ start:
 	env/bin/python3 src/main.py
 
 .PHONY: start-docker
-start-docker: build cloud-init.sh
+start-docker: build cloud-init.sh scaler.cloud-init.sh
 	docker-compose up -d
 
 tests/mock.env:

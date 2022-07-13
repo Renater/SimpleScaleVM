@@ -1,26 +1,29 @@
 #!/usr/bin/python3
 """
-Define the HTTP server launcher of the autoscaling module.
+Define the HTTP server launcher of the scaling module.
 
 Classes:
     ServerLauncher
 """
 
+from functools import partial
 from http.server import HTTPServer
+from typing import Callable
 from server.request_handler import ServerRequestHandler
 
 
 class ServerLauncher():
-    """Launcher of autoscaling HTTP servers."""
+    """Launcher of HTTP servers."""
 
     host: str
     port: int
     server: HTTPServer
 
-    def __init__(self, host: str, port: int):
+    def __init__(self, host: str, port: int, status_function: Callable[[None], bool]):
         self.host = host
         self.port = port
-        self.server = HTTPServer((self.host, self.port), ServerRequestHandler)
+        server_request_handler = partial(ServerRequestHandler, status_function)
+        self.server = HTTPServer((self.host, self.port), server_request_handler)
 
     def serve(self):
         """Start the HTTP server and serve it forever."""

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Set the OpenStack provider for the autoscaling module.
+Set the OpenStack provider for the scaling module.
 
 Classes:
     ProviderService
@@ -10,15 +10,22 @@ from typing import Dict, List, Union
 from threading import Thread
 import openstack
 from providers.openstack.settings import (
-    OPENSTACK_FLAVOR,
     OPENSTACK_FLOATING_IP_DESCRIPTION,
-    OPENSTACK_IMAGE,
     OPENSTACK_IP_VERSION,
     OPENSTACK_KEYPAIR,
     OPENSTACK_METADATA_KEY,
-    OPENSTACK_METADATA_VALUE,
-    OPENSTACK_NETWORK,
-    OPENSTACK_CLOUD_INIT_FILE,
+    OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE,
+    OPENSTACK_AUTOSCALER_FLAVOR,
+    OPENSTACK_AUTOSCALER_IMAGE,
+    OPENSTACK_AUTOSCALER_NAME,
+    OPENSTACK_AUTOSCALER_NETWORK,
+    OPENSTACK_METADATA_AUTOSCALER_VALUE,
+    OPENSTACK_SCALED_CLOUD_INIT_FILE,
+    OPENSTACK_SCALED_FLAVOR,
+    OPENSTACK_SCALED_IMAGE,
+    OPENSTACK_SCALED_NAME,
+    OPENSTACK_SCALED_NETWORK,
+    OPENSTACK_METADATA_SCALED_VALUE,
 )
 from providers.schema import BaseProviderService
 from providers.replica import Replica, ReplicaStatus
@@ -31,27 +38,39 @@ class ProviderService(BaseProviderService):
         super().__init__(external_address_management)
         self.connector = openstack.connect(cloud="envvars")
 
-    def list(self) -> List[Replica]:
+    def list(self, autoscaling: bool = False) -> List[Replica]:
+
+        def get_external_addresses():
+            # Search for external addresses if `EXTERNAL_ADDRESS_MANAGEMENT` is enabled
+            external_addresses = {}
+            if self.external_address_management:
+                for floating_ip_object in self.connector.list_floating_ips():
+                    if (
+                        floating_ip_object.description == OPENSTACK_FLOATING_IP_DESCRIPTION
+                        and floating_ip_object.attached
+                    ):
+                        external_addresses[
+                            floating_ip_object.fixed_ip_address
+                        ] = floating_ip_object.floating_ip_address
+
+            return external_addresses
+
+
+        if autoscaling:
+            metadata_value = OPENSTACK_METADATA_AUTOSCALER_VALUE
+            network = OPENSTACK_AUTOSCALER_NETWORK
+        else:
+            metadata_value = OPENSTACK_METADATA_SCALED_VALUE
+            network = OPENSTACK_SCALED_NETWORK
 
         servers = []
-
-        # Search for external addresses if `EXTERNAL_ADDRESS_MANAGEMENT` is enabled
-        external_addresses = {}
-        if self.external_address_management:
-            for floating_ip_object in self.connector.list_floating_ips():
-                if (
-                    floating_ip_object.description == OPENSTACK_FLOATING_IP_DESCRIPTION
-                    and floating_ip_object.attached
-                ):
-                    external_addresses[
-                        floating_ip_object.fixed_ip_address
-                    ] = floating_ip_object.floating_ip_address
+        external_addresses = get_external_addresses()
 
         for server_object in self.connector.compute.servers():
             server = server_object.to_dict()
             if (
                 OPENSTACK_METADATA_KEY in server["metadata"] and
-                server["metadata"][OPENSTACK_METADATA_KEY] == OPENSTACK_METADATA_VALUE
+                server["metadata"][OPENSTACK_METADATA_KEY] == metadata_value
             ):
                 # If a deletion order has been sent, do not count the virtual machine
                 if server["task_state"] == "deleting":
@@ -70,14 +89,14 @@ class ProviderService(BaseProviderService):
 
                 # If an active VM does not have any IP address yet, count it as creating
                 if (
-                    OPENSTACK_NETWORK not in server["addresses"] and
+                    network not in server["addresses"] and
                     server_status == ReplicaStatus.CREATED_UNKNOWN
                 ):
                     server_status = ReplicaStatus.CREATING
 
                 # Get the IP address of the virtual machine
-                elif OPENSTACK_NETWORK in server["addresses"]:
-                    for server_port in server["addresses"][OPENSTACK_NETWORK]:
+                elif network in server["addresses"]:
+                    for server_port in server["addresses"][network]:
                         if (
                             server_port["version"] == OPENSTACK_IP_VERSION
                             and server_port["OS-EXT-IPS:type"] == "fixed"
@@ -97,25 +116,38 @@ class ProviderService(BaseProviderService):
 
         return servers
 
-    def create(self, count: int = 1):
+    def create(self, count: int = 1, autoscaling: bool = False):
 
         def creation_function():
-            server_configuration = {
-                "name": "server",
-                "image": OPENSTACK_IMAGE,
-                "flavor": OPENSTACK_FLAVOR,
-                "network": OPENSTACK_NETWORK,
-                "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_VALUE },
-            }
+
+            if autoscaling:
+                server_configuration = {
+                    "name": OPENSTACK_AUTOSCALER_NAME,
+                    "image": OPENSTACK_AUTOSCALER_IMAGE,
+                    "flavor": OPENSTACK_AUTOSCALER_FLAVOR,
+                    "network": OPENSTACK_AUTOSCALER_NETWORK,
+                    "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_AUTOSCALER_VALUE },
+                }
+                # Add optional cloud-init
+                if OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE:
+                    with open(OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE, encoding="utf-8") as file:
+                        server_configuration["userdata"] = file.read()
+            else:
+                server_configuration = {
+                    "name": OPENSTACK_SCALED_NAME,
+                    "image": OPENSTACK_SCALED_IMAGE,
+                    "flavor": OPENSTACK_SCALED_FLAVOR,
+                    "network": OPENSTACK_SCALED_NETWORK,
+                    "meta": { OPENSTACK_METADATA_KEY: OPENSTACK_METADATA_SCALED_VALUE },
+                }
+                # Add optional cloud-init
+                if OPENSTACK_SCALED_CLOUD_INIT_FILE:
+                    with open(OPENSTACK_SCALED_CLOUD_INIT_FILE, encoding="utf-8") as file:
+                        server_configuration["userdata"] = file.read()
 
             # Add optional key pair
             if OPENSTACK_KEYPAIR:
                 server_configuration["key_name"] = OPENSTACK_KEYPAIR
-
-            # Add optional cloud-init
-            if OPENSTACK_CLOUD_INIT_FILE:
-                with open(OPENSTACK_CLOUD_INIT_FILE, encoding="utf-8") as cloud_init_file:
-                    server_configuration["userdata"] = cloud_init_file.read()
 
             return self.connector.create_server(**server_configuration)
 

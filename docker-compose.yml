@@ -10,4 +10,5 @@ services:
       - "${APP_PORT}:${APP_PORT}"
     env_file: .env
     volumes:
-      - ./cloud-init.sh:/${OPENSTACK_CLOUD_INIT_FILE}
+      - ./cloud-init.sh:/${OPENSTACK_SCALED_CLOUD_INIT_FILE}
+      - ./scaler.cloud-init.sh:/${OPENSTACK_AUTOSCALER_CLOUD_INIT_FILE}

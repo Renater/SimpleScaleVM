@@ -63,6 +63,6 @@ The general functioning of the feature is summarized in the following graphic:
 
 ![autoscaling infrastructure](./autoscaling_infrastructure.png)
 
-The mechanism that is used to elect a new master relies on lexicographical order: when a master goes down, each scaler checks if its ID is the lowest among all healthy replicas to determine if it should become master. The following example illustrates this process:
+The mechanism that is used to elect a new master relies on lexicographical order: when a master goes down, each scaler checks if its internal address is the lowest among all healthy replicas to determine if it should become master. The following example illustrates this process:
 
 ![autoscaling master](./autoscaling_master.png)

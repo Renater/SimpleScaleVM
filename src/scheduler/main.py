@@ -39,14 +39,14 @@ class Scheduler():
                 autoscaling_configuration["min_available_resources"],
                 autoscaling_configuration["address"],
             )
-            self.job_queue.add_job(self.autoscaler.loop, "interval", minutes=1)
+            self.job_queue.add_job(self.autoscaler.loop, "interval", minutes=0.5)
             self.job_queue.add_job(
                 lambda : self.service.loop(self.autoscaler.get_master),
                 "interval",
-                minutes=1
+                minutes=0.5
             )
         else:
-            self.job_queue.add_job(self.service.loop, "interval", minutes=1)
+            self.job_queue.add_job(self.service.loop, "interval", minutes=0.5)
 
     def start(self):
         """Start the scheduling of all jobs in the job queue."""
